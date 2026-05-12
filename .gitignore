@@ -1,7 +1,11 @@
+# TypeScript incremental build cache (evita commit se alguma ferramenta gerar)
+*.tsbuildinfo
+
 # Nestjs specific
 /dist
 /node_modules
 /build
+/coverage
 /tmp
 
 # Logs
@@ -22,3 +26,4 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+

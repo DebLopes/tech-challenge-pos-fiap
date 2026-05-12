@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+import { ConfigureModule } from './contexts/shared/infrastructure/configure/configure.module';
+import { EstoqueModule } from './contexts/shared/infrastructure/ioc/estoque.module';
+import { IdentidadeModule } from './contexts/shared/infrastructure/ioc/identidade.module';
+import { OrdemDeServicoModule } from './contexts/shared/infrastructure/ioc/ordem-de-servico.module';
+
+@Module({
+  imports: [
+    ConfigureModule,
+    IdentidadeModule,
+    EstoqueModule,
+    OrdemDeServicoModule,
+  ],
+})
+export class AppModule {}
