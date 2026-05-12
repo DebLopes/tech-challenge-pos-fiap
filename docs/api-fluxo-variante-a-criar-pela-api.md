@@ -1,6 +1,6 @@
 # Variante A — Criar tudo pela API
 
-Objetivo: mesmo tipo de cenário que o teste `service-order-flow.integration-spec.ts`, com dados que **não chocam** com as fixtures da migration (`52998224725`, `APL-1234`, `DEMO-*`).
+Objetivo: mesmo tipo de cenário que o teste `test/integration/ordem-de-servico/service-order-flow.integration-spec.ts`, com dados que **não chocam** com as fixtures da migration (`52998224725`, `APL-1234`, `DEMO-*`).
 
 **Antes:** login e contexto em [Fluxo feliz da API — índice](api-fluxo-url-body.md).
 
