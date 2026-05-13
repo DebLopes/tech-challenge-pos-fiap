@@ -2,7 +2,6 @@
 
 API de oficina mecânica: ordens de serviço, clientes, veículos, catálogo, produtos, estoque e rotas públicas para orçamento/status. **NestJS**, **TypeScript**, **MongoDB**, **JWT** e **Swagger** em **`/api`**.
 
----
 
 ## Como rodar o projeto com Docker Compose
 
@@ -137,12 +136,13 @@ Lá podes testar rotas com JWT (botão *Authorize*, token do `POST /auth/login`)
 
 | Comando | Descrição |
 |---------|-----------|
-| `yarn test` | Testes unitários (com cobertura) |
+| `yarn test` | Testes unitários (com cobertura mínima nos domínios críticos) |
+| `yarn test:integration` | Testes de integração do fluxo principal da OS (Mongo em execução) |
 | `yarn lint` | ESLint |
 | `yarn format` | Prettier |
 | `yarn build` | Build para produção |
 | `yarn start:prod` | Correr o build |
 
-Roteiro manual de testes: [docs/testes-passo-a-passo.md](docs/testes-passo-a-passo.md). Fluxo feliz só com **URL e body:** [docs/api-fluxo-url-body.md](docs/api-fluxo-url-body.md) (índice e login), [docs/api-fluxo-variante-a-criar-pela-api.md](docs/api-fluxo-variante-a-criar-pela-api.md) (criar dados pela API) e [docs/api-fluxo-variante-b-migration-fixtures.md](docs/api-fluxo-variante-b-migration-fixtures.md) (fixtures `yarn migrate:up`).
+Roteiros manuais com **URL e body:** [docs/api-fluxo-url-body.md](docs/api-fluxo-url-body.md) (índice e login), [docs/api-fluxo-variante-a-criar-pela-api.md](docs/api-fluxo-variante-a-criar-pela-api.md) (criar dados pela API) e [docs/api-fluxo-variante-b-migration-fixtures.md](docs/api-fluxo-variante-b-migration-fixtures.md) (fixtures `yarn migrate:up`).
 
 **Licença:** UNLICENSED (projeto acadêmico).
