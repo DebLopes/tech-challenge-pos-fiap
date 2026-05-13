@@ -28,11 +28,11 @@ Duas formas de chegar à mesma sequência (**registar diagnóstico** com `PATCH 
 ```json
 {
   "email": "admin@local.dev",
-  "password": "admin123"
+  "password": "<SEED_ADMIN_PASSWORD do teu .env>"
 }
 ```
 
-*(Credenciais padrão do seed — [.env.example](../.env.example).)*
+*(Credenciais do seed: `SEED_ADMIN_EMAIL` e `SEED_ADMIN_PASSWORD` — [.env.example](../.env.example).)*
 
 ---
 

@@ -5,7 +5,6 @@ services:
       target: development
     container_name: api
     working_dir: /app
-    # node_modules em volume anônimo: garantir CLI e módulos nativos (ex.: bcrypt) no Linux
     command: sh -c "yarn install && yarn start:dev"
     ports:
       - '3000:3000'
@@ -13,11 +12,11 @@ services:
       - mongo
     environment:
       - MONGO_URL=mongodb://mongo:27017/techChallenge
-      - JWT_SECRET=dev-secret-change-in-production
-      - JWT_EXPIRES_IN=1d
-      - SEED_ADMIN_EMAIL=admin@local.dev
-      - SEED_ADMIN_PASSWORD=admin123
-      - SEED_ADMIN_NAME=Admin local
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-1d}
+      - SEED_ADMIN_EMAIL=${SEED_ADMIN_EMAIL:-admin@local.dev}
+      - SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
+      - SEED_ADMIN_NAME=${SEED_ADMIN_NAME:-Admin local}
     volumes:
       - .:/app
       - /app/node_modules
