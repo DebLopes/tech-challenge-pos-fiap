@@ -76,7 +76,7 @@ describe('Auth use cases', () => {
 
   it('login returns JWT string', async () => {
     const repo = new InMemoryUserRepository();
-    const hash = await bcrypt.hash(validPassword, 4);
+    const hash = await bcrypt.hash(validPassword, 10);
     await repo.create(
       User.create({
         name: 'X',
@@ -102,7 +102,7 @@ describe('Auth use cases', () => {
 
   it('login rejects wrong password', async () => {
     const repo = new InMemoryUserRepository();
-    const hash = await bcrypt.hash(validPassword, 4);
+    const hash = await bcrypt.hash(validPassword, 10);
     await repo.create(
       User.create({
         name: 'X',
