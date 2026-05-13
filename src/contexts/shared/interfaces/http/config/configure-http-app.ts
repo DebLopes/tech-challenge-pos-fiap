@@ -9,15 +9,7 @@ export function configureHttpApp(app: INestApplication): void {
       'Sistema para gestão de ordens de serviço, clientes, veículos, peças e execução de serviços',
     )
     .setVersion('1.0.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        in: 'header',
-      },
-      SWAGGER_JWT_AUTH,
-    )
+    .addBearerAuth(undefined, SWAGGER_JWT_AUTH)
     .build();
 
   app.useGlobalPipes(
