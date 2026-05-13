@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { INTEGRATION_USER_PASSWORD } from '../dev-credentials.fixture';
 import {
   bootstrapIntegrationApp,
   loginAsIntegrationAdmin,
@@ -26,7 +27,7 @@ describe('Estoque — papel estoquista (integration)', () => {
 
     const suffix = Date.now();
     const stockistEmail = `integration-estoquista-${suffix}@test.dev`;
-    const stockistPassword = 'integrationPass1';
+    const stockistPassword = INTEGRATION_USER_PASSWORD;
 
     const register = await request(app.getHttpServer())
       .post('/auth/users')
@@ -89,7 +90,7 @@ describe('Estoque — papel estoquista (integration)', () => {
       .send({
         name: 'Integration Atendente',
         email: atendenteEmail,
-        password: 'integrationPass1',
+        password: INTEGRATION_USER_PASSWORD,
         role: 'atendente',
         active: true,
       });
@@ -98,7 +99,7 @@ describe('Estoque — papel estoquista (integration)', () => {
     const token = await loginWithCredentials(
       app,
       atendenteEmail,
-      'integrationPass1',
+      INTEGRATION_USER_PASSWORD,
     );
     const res = await request(app.getHttpServer())
       .post('/product')

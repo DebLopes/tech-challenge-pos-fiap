@@ -4,17 +4,22 @@ import { expect } from '@jest/globals';
 import request from 'supertest';
 import { AppModule } from '../../../src/app.module';
 import { configureHttpApp } from '../../../src/contexts/shared/interfaces/http/config/configure-http-app';
+import {
+  INTEGRATION_ADMIN_EMAIL,
+  INTEGRATION_ADMIN_NAME,
+  INTEGRATION_ADMIN_PASSWORD,
+  INTEGRATION_JWT_SECRET,
+} from '../dev-credentials.fixture';
 import { integrationAdminCredentials } from '../mocks/auth.mock';
 import { resolveIntegrationMongoUrl } from './mongo-url';
 
 export async function bootstrapIntegrationApp(): Promise<INestApplication> {
   process.env.MONGO_URL = resolveIntegrationMongoUrl();
-  process.env.JWT_SECRET =
-    'integration-test-secret-at-least-32-characters-long';
+  process.env.JWT_SECRET = INTEGRATION_JWT_SECRET;
   process.env.JWT_EXPIRES_IN = '1d';
-  process.env.SEED_ADMIN_EMAIL = integrationAdminCredentials.email;
-  process.env.SEED_ADMIN_PASSWORD = integrationAdminCredentials.password;
-  process.env.SEED_ADMIN_NAME = integrationAdminCredentials.name;
+  process.env.SEED_ADMIN_EMAIL = INTEGRATION_ADMIN_EMAIL;
+  process.env.SEED_ADMIN_PASSWORD = INTEGRATION_ADMIN_PASSWORD;
+  process.env.SEED_ADMIN_NAME = INTEGRATION_ADMIN_NAME;
 
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
@@ -37,9 +42,14 @@ export async function loginWithCredentials(
   email: string,
   password: string,
 ): Promise<string> {
+  const e = email?.trim();
+  const p = password?.trim();
+  if (!e || !p) {
+    throw new Error('loginWithCredentials: email e password são obrigatórios');
+  }
   const res = await request(app.getHttpServer())
     .post('/auth/login')
-    .send({ email, password });
+    .send({ email: e, password: p });
   expect([200, 201]).toContain(res.status);
   expect(typeof res.body.access_token).toBe('string');
   return res.body.access_token as string;

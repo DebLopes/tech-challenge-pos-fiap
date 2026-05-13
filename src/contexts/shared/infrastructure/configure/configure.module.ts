@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // Em testes, não carregar `.env` do disco: evita JWT/seed vazios a sobrescrever o que o bootstrap de integração define.
+      ignoreEnvFile: process.env.NODE_ENV === 'test',
       envFilePath: '.env',
     }),
   ],
