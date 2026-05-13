@@ -1,3 +1,9 @@
+# O Docker Compose lê o ficheiro .env na raiz do repositório (mesma pasta que este ficheiro)
+# para substituir ${JWT_SECRET} e ${SEED_ADMIN_PASSWORD} no serviço api.
+# Antes de: docker compose up -d --build (com a api), cria .env a partir de .env.example
+# e preenche pelo menos JWT_SECRET e SEED_ADMIN_PASSWORD (não vazios).
+# Para subir só o Mongo: docker compose up -d mongo — não precisas destes segredos para a api.
+
 services:
   api:
     build:

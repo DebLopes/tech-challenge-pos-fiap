@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -19,10 +20,12 @@ describe('Auth (integration)', () => {
   });
 
   it('POST /auth/login — credenciais inválidas — 401', async () => {
-    const res = await request(app.getHttpServer()).post('/auth/login').send({
-      email: integrationAdminCredentials.email,
-      password: 'wrong-password',
-    });
+    const res = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: integrationAdminCredentials.email,
+        password: randomBytes(18).toString('base64url'),
+      });
     expect(res.status).toBe(401);
   });
 

@@ -1,5 +1,6 @@
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { randomBytes } from 'node:crypto';
 import { describe, expect, it } from '@jest/globals';
 import * as bcrypt from 'bcrypt';
 import { User } from '../../../domain/entities/user';
@@ -30,6 +31,9 @@ class InMemoryUserRepository implements UserRepositoryInterface {
 }
 
 describe('Auth use cases', () => {
+  const validPassword = randomBytes(16).toString('base64url');
+  const alternatePassword = randomBytes(16).toString('base64url');
+
   it('create-user keeps email lowercase and hashes password', async () => {
     const repo = new InMemoryUserRepository();
     const useCase = new CreateUserUseCase(repo);
@@ -37,14 +41,16 @@ describe('Auth use cases', () => {
     const result = await useCase.execute({
       name: 'Admin',
       email: 'Admin@Test.COM',
-      password: 'secret12',
+      password: validPassword,
       role: UserRole.ADMIN,
     });
 
     expect(result.email).toBe('admin@test.com');
     const stored = await repo.findByEmail('admin@test.com');
     expect(stored).not.toBeNull();
-    expect(await bcrypt.compare('secret12', stored!.passwordHash)).toBe(true);
+    expect(await bcrypt.compare(validPassword, stored!.passwordHash)).toBe(
+      true,
+    );
   });
 
   it('create-user rejects duplicate email', async () => {
@@ -54,7 +60,7 @@ describe('Auth use cases', () => {
     await useCase.execute({
       name: 'A',
       email: 'dup@test.com',
-      password: 'secret12',
+      password: validPassword,
       role: UserRole.ADMIN,
     });
 
@@ -62,7 +68,7 @@ describe('Auth use cases', () => {
       useCase.execute({
         name: 'B',
         email: 'dup@test.com',
-        password: 'otherpwd12',
+        password: alternatePassword,
         role: UserRole.ATENDENTE,
       }),
     ).rejects.toBeInstanceOf(ConflictException);
@@ -70,7 +76,7 @@ describe('Auth use cases', () => {
 
   it('login returns JWT string', async () => {
     const repo = new InMemoryUserRepository();
-    const hash = await bcrypt.hash('secret12', 4);
+    const hash = await bcrypt.hash(validPassword, 4);
     await repo.create(
       User.create({
         name: 'X',
@@ -88,7 +94,7 @@ describe('Auth use cases', () => {
     const useCase = new LoginUseCase(repo, jwt);
     const out = await useCase.execute({
       email: 'x@test.com',
-      password: 'secret12',
+      password: validPassword,
     });
 
     expect(out.access_token).toBe('signed-token');
@@ -96,7 +102,7 @@ describe('Auth use cases', () => {
 
   it('login rejects wrong password', async () => {
     const repo = new InMemoryUserRepository();
-    const hash = await bcrypt.hash('secret12', 4);
+    const hash = await bcrypt.hash(validPassword, 4);
     await repo.create(
       User.create({
         name: 'X',
@@ -113,7 +119,10 @@ describe('Auth use cases', () => {
 
     const useCase = new LoginUseCase(repo, jwt);
     await expect(
-      useCase.execute({ email: 'x@test.com', password: 'wrong' }),
+      useCase.execute({
+        email: 'x@test.com',
+        password: randomBytes(16).toString('base64url'),
+      }),
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 
