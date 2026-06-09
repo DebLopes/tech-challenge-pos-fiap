@@ -112,6 +112,8 @@ A referência completa dos endpoints, corpos de pedido e respostas está no **Sw
 
 Lá podes testar rotas com JWT (botão *Authorize*, token do `POST /auth/login`) e as rotas públicas sob **`/public/...`**.
 
+---
+
 ### Tecnologias utilizadas
 
 - Node.js, TypeScript  
@@ -119,6 +121,8 @@ Lá podes testar rotas com JWT (botão *Authorize*, token do `POST /auth/login`)
 - MongoDB  
 - Docker e Docker Compose  
 - migrate-mongo (migrations)
+
+---
 
 ### Visão geral dos recursos (detalhe no Swagger)
 
@@ -132,6 +136,24 @@ Lá podes testar rotas com JWT (botão *Authorize*, token do `POST /auth/login`)
 
 ---
 
+## Justificativa da escolha do MongoDB
+
+O MongoDB se encaixa muito bem no contexto desta aplicação, principalmente devido à estrutura da Ordem de Serviço (OS), que concentra diversas informações relacionadas ao atendimento em um único registro.
+
+A modelagem orientada a documentos permite armazenar na própria Ordem de Serviço todos os dados necessários para sua consulta, funcionando como um *snapshot* das informações relevantes no momento da criação. Dessa forma, a OS torna-se um registro independente, reduzindo a necessidade de múltiplas consultas e relacionamentos para recuperar os dados de um atendimento.
+
+Outro ponto importante é a flexibilidade do esquema. Em estágios iniciais da aplicação, a estrutura da Ordem de Serviço pode não possuir relacionamentos mais complexos, como peças, histórico detalhado ou múltiplos status. Conforme a aplicação evolui, novos campos e estruturas podem ser adicionados ao documento sem a necessidade de migrações complexas ou alterações significativas no banco de dados. Isso permite que documentos mais antigos coexistam com versões mais recentes da estrutura.
+
+Além disso, o MongoDB oferece suporte a transações ACID, garantindo consistência e confiabilidade dos dados. Após avaliar os requisitos do projeto, identificou-se que a principal necessidade era assegurar a integridade das informações registradas durante o ciclo de vida da Ordem de Serviço.
+
+A aplicação possui um fluxo orientado a ações realizadas pelos usuários. Por exemplo, um atendente cria manualmente uma Ordem de Serviço, um mecânico adiciona peças e atualiza o orçamento, e o cliente realiza a aprovação do serviço. Como as alterações no banco de dados são resultado de ações humanas e ocorrem de forma gradual, não existe um cenário de alta concorrência ou processamento massivo que exija soluções voltadas principalmente para escalabilidade.
+
+Dessa forma, a confiabilidade dos dados, a flexibilidade da modelagem e a capacidade de evolução do esquema sem grandes impactos na aplicação foram os principais critérios para a escolha do MongoDB, pois estão diretamente alinhados às necessidades do domínio e ao fluxo operacional da aplicação.
+
+Por fim, a utilização do NestJS contribuiu para essa escolha, pois a integração com o MongoDB por meio do Mongoose é simples, madura e amplamente utilizada pela comunidade, facilitando a modelagem, validação e manutenção dos documentos da aplicação.
+
+---
+
 ## Testes, lint e produção
 
 | Comando | Descrição |
@@ -142,6 +164,9 @@ Lá podes testar rotas com JWT (botão *Authorize*, token do `POST /auth/login`)
 | `yarn format` | Prettier |
 | `yarn build` | Build para produção |
 | `yarn start:prod` | Correr o build |
+
+
+---
 
 Roteiros manuais com **URL e body:** [docs/api-fluxo-url-body.md](docs/api-fluxo-url-body.md) (índice e login), [docs/api-fluxo-variante-a-criar-pela-api.md](docs/api-fluxo-variante-a-criar-pela-api.md) (criar dados pela API) e [docs/api-fluxo-variante-b-migration-fixtures.md](docs/api-fluxo-variante-b-migration-fixtures.md) (fixtures `yarn migrate:up`).
 
