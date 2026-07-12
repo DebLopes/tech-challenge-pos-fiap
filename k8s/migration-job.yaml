@@ -25,7 +25,7 @@ spec:
             - until nc -z mongo 27017; do echo "aguardando mongo..."; sleep 2; done
       containers:
         - name: migrate
-          image: tech-challenge-api:build
+          image: tech-challenge-api:migrations
           imagePullPolicy: IfNotPresent
           command:
             - yarn

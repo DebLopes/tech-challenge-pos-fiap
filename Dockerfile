@@ -43,18 +43,37 @@ RUN find . -type f -name '*.json' \
 
 
 # =========================
-# Production
+# Production dependencies
 # =========================
-FROM node:22.17.1-alpine3.22 AS production
+FROM build AS prod-deps
 
-WORKDIR /usr/src/app
-
-RUN corepack enable
-
-COPY package.json yarn.lock ./
+ENV NODE_ENV=production
 
 RUN yarn install --frozen-lockfile --production
 
+
+# =========================
+# Migrations (K8s Job)
+# =========================
+FROM build AS migrations
+
+WORKDIR /usr/src/app
+
+CMD ["yarn", "migrate:up"]
+
+
+# =========================
+# Production
+# =========================
+FROM node:22.17.1-bookworm-slim AS production
+
+WORKDIR /usr/src/app
+
+ENV NODE_ENV=production
+
+COPY --chown=node:node package.json yarn.lock ./
+
+COPY --chown=node:node --from=prod-deps /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 
 USER node
