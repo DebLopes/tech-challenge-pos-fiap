@@ -77,6 +77,12 @@ API de oficina mecânica: ordens de serviço, clientes, veículos, catálogo, pr
 
 ---
 
+## Infraestrutura (Terraform)
+
+Para provisionar o cluster Kubernetes local (Kind), namespace e metrics-server, consulte [`infra/README.md`](infra/README.md).
+
+---
+
 ## Execução local sem Docker (API na máquina)
 
 1. Segue os passos **1 a 5** da secção anterior (clone, `cd`, `nvm use`, `yarn install`, `cp .env.example .env`).
