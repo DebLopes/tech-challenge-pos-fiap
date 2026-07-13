@@ -1,16 +1,15 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+  BusinessRuleViolationError,
+  EntityNotFoundError,
+} from '../../../../shared/domain/errors';
 import { CatalogService } from '../../../domain/entities/catalog-service';
 import type { CatalogServiceRepositoryInterface } from '../../../domain/repositories/catalog-service.repository';
-import type { ProductRepositoryInterface } from '../../../domain/repositories/product.repository';
+import { CATALOG_SERVICE_REPOSITORY } from '../../../domain/repositories/tokens';
 import {
-  CATALOG_SERVICE_REPOSITORY,
-  PRODUCT_REPOSITORY,
-} from '../../../domain/repositories/tokens';
+  PRODUCT_LOOKUP,
+  type ProductLookupPort,
+} from '../../../domain/services/product-lookup.port';
 import type { UpdateCatalogServiceInput } from './catalog-service.inputs';
 
 @Injectable()
@@ -18,8 +17,8 @@ export class UpdateCatalogServiceUseCase {
   constructor(
     @Inject(CATALOG_SERVICE_REPOSITORY)
     private readonly catalogRepo: CatalogServiceRepositoryInterface,
-    @Inject(PRODUCT_REPOSITORY)
-    private readonly productRepo: ProductRepositoryInterface,
+    @Inject(PRODUCT_LOOKUP)
+    private readonly productLookup: ProductLookupPort,
   ) {}
 
   async execute(
@@ -28,7 +27,7 @@ export class UpdateCatalogServiceUseCase {
   ): Promise<CatalogService> {
     const existing = await this.catalogRepo.findById(id);
     if (!existing) {
-      throw new NotFoundException('Catalog service not found');
+      throw new EntityNotFoundError('Catalog service not found');
     }
 
     if (input.defaultParts) {
@@ -62,21 +61,21 @@ export class UpdateCatalogServiceUseCase {
     } catch (e) {
       const message =
         e instanceof Error ? e.message : 'Invalid catalog service';
-      throw new BadRequestException(message);
+      throw new BusinessRuleViolationError(message);
     }
 
     const updated = await this.catalogRepo.updateById(id, merged);
     if (!updated) {
-      throw new NotFoundException('Catalog service not found');
+      throw new EntityNotFoundError('Catalog service not found');
     }
     return updated;
   }
 
   private async assertProductsExist(codes: string[]): Promise<void> {
     for (const code of codes) {
-      const product = await this.productRepo.findByCodeOrNull(code);
+      const product = await this.productLookup.findByCodeOrNull(code);
       if (!product) {
-        throw new BadRequestException(
+        throw new BusinessRuleViolationError(
           `Product with code "${code}" not found. Register the product before linking.`,
         );
       }

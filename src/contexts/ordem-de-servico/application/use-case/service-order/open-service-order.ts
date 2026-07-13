@@ -1,54 +1,51 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { Client } from '../../../../identidade/domain/entities/client';
-import { Vehicle } from '../../../../identidade/domain/entities/vehicle';
-import type { ClientRepositoryInterface } from '../../../../identidade/domain/repositories/client.repository';
-import type { VehicleRepositoryInterface } from '../../../../identidade/domain/repositories/vehicle.repository';
-import {
-  CLIENT_REPOSITORY,
-  VEHICLE_REPOSITORY,
-} from '../../../../identidade/domain/repositories/tokens';
-import { CreateClientUseCase } from '../../../../identidade/application/use-case/client/create-client';
-import { CreateVehicleUseCase } from '../../../../identidade/application/use-case/vehicle/create-vehicle';
+  BusinessRuleViolationError,
+  EntityNotFoundError,
+} from '../../../../shared/domain/errors';
 import {
   ServiceOrder,
   type ServiceOrderPartLine,
   type ServiceOrderServiceLine,
 } from '../../../domain/entities/service-order';
 import type { CatalogServiceRepositoryInterface } from '../../../domain/repositories/catalog-service.repository';
-import type { ProductRepositoryInterface } from '../../../domain/repositories/product.repository';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
 import {
   CATALOG_SERVICE_REPOSITORY,
-  PRODUCT_REPOSITORY,
   SERVICE_ORDER_REPOSITORY,
 } from '../../../domain/repositories/tokens';
+import {
+  CLIENT_PROVISIONING,
+  type ClientProvisioningPort,
+} from '../../../domain/services/client-provisioning.port';
+import {
+  VEHICLE_PROVISIONING,
+  type VehicleProvisioningPort,
+} from '../../../domain/services/vehicle-provisioning.port';
+import {
+  PRODUCT_LOOKUP,
+  type ProductLookupPort,
+} from '../../../domain/services/product-lookup.port';
 import type { OpenServiceOrderInput } from './service-order.inputs';
 
 @Injectable()
 export class OpenServiceOrderUseCase {
   constructor(
-    @Inject(CLIENT_REPOSITORY)
-    private readonly clientRepo: ClientRepositoryInterface,
-    @Inject(VEHICLE_REPOSITORY)
-    private readonly vehicleRepo: VehicleRepositoryInterface,
+    @Inject(CLIENT_PROVISIONING)
+    private readonly clientProvisioning: ClientProvisioningPort,
+    @Inject(VEHICLE_PROVISIONING)
+    private readonly vehicleProvisioning: VehicleProvisioningPort,
     @Inject(SERVICE_ORDER_REPOSITORY)
     private readonly orderRepo: ServiceOrderRepositoryInterface,
     @Inject(CATALOG_SERVICE_REPOSITORY)
     private readonly catalogRepo: CatalogServiceRepositoryInterface,
-    @Inject(PRODUCT_REPOSITORY)
-    private readonly productRepo: ProductRepositoryInterface,
-    private readonly createClient: CreateClientUseCase,
-    private readonly createVehicle: CreateVehicleUseCase,
+    @Inject(PRODUCT_LOOKUP)
+    private readonly productLookup: ProductLookupPort,
   ) {}
 
   async execute(input: OpenServiceOrderInput): Promise<ServiceOrder> {
-    const client = await this.getOrCreateClient(input.client);
-    const vehicle = await this.getOrCreateVehicle(input.vehicle);
+    const client = await this.clientProvisioning.getOrCreate(input.client);
+    const vehicle = await this.vehicleProvisioning.getOrCreate(input.vehicle);
     const serviceLines = await this.resolveServiceLines(input.services ?? []);
     const partLines = await this.resolvePartLines(input.parts ?? []);
 
@@ -81,17 +78,19 @@ export class OpenServiceOrderUseCase {
     for (const service of services) {
       const catalog = await this.catalogRepo.findById(service.catalogServiceId);
       if (!catalog) {
-        throw new NotFoundException('Catalog service not found');
+        throw new EntityNotFoundError('Catalog service not found');
       }
       if (!catalog.active) {
-        throw new BadRequestException(
+        throw new BusinessRuleViolationError(
           'Cannot add an inactive catalog service to an order',
         );
       }
 
       const defaultParts: ServiceOrderServiceLine['defaultParts'] = [];
       for (const p of catalog.defaultParts ?? []) {
-        const product = await this.productRepo.findByCodeOrNull(p.productCode);
+        const product = await this.productLookup.findByCodeOrNull(
+          p.productCode,
+        );
         defaultParts.push({
           productCode: p.productCode,
           name: product?.name ?? p.productCode,
@@ -118,9 +117,9 @@ export class OpenServiceOrderUseCase {
 
     for (const part of parts) {
       const code = part.productCode.trim().toUpperCase();
-      const product = await this.productRepo.findByCodeOrNull(code);
+      const product = await this.productLookup.findByCodeOrNull(code);
       if (!product) {
-        throw new NotFoundException(`Product "${code}" not found`);
+        throw new EntityNotFoundError(`Product "${code}" not found`);
       }
 
       lines.push({
@@ -131,31 +130,5 @@ export class OpenServiceOrderUseCase {
     }
 
     return lines;
-  }
-
-  private async getOrCreateClient(
-    input: OpenServiceOrderInput['client'],
-  ): Promise<Client> {
-    try {
-      return await this.clientRepo.findByDocument(input.document);
-    } catch (error) {
-      if (!(error instanceof NotFoundException)) {
-        throw error;
-      }
-      return this.createClient.execute(input);
-    }
-  }
-
-  private async getOrCreateVehicle(
-    input: OpenServiceOrderInput['vehicle'],
-  ): Promise<Vehicle> {
-    try {
-      return await this.vehicleRepo.findByPlate(input.plate);
-    } catch (error) {
-      if (!(error instanceof NotFoundException)) {
-        throw error;
-      }
-      return this.createVehicle.execute(input);
-    }
   }
 }

@@ -1,9 +1,8 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+  BusinessRuleViolationError,
+  EntityNotFoundError,
+} from '../../../../shared/domain/errors';
 import type {
   Budget,
   BudgetItem,
@@ -11,9 +10,11 @@ import type {
 import { ServiceOrder } from '../../../domain/entities/service-order';
 import { ServiceOrderStatus } from '../../../domain/entities/service-order-status';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
-import type { ClientRepositoryInterface } from '../../../../identidade/domain/repositories/client.repository';
 import { SERVICE_ORDER_REPOSITORY } from '../../../domain/repositories/tokens';
-import { CLIENT_REPOSITORY } from '../../../../identidade/domain/repositories/tokens';
+import {
+  CLIENT_LOOKUP,
+  type ClientLookupPort,
+} from '../../../domain/services/client-lookup.port';
 import {
   BUDGET_DELIVERY_NOTIFIER,
   type BudgetDeliveryNotifier,
@@ -28,8 +29,8 @@ export class GenerateBudgetUseCase {
   constructor(
     @Inject(SERVICE_ORDER_REPOSITORY)
     private readonly orderRepo: ServiceOrderRepositoryInterface,
-    @Inject(CLIENT_REPOSITORY)
-    private readonly clientRepo: ClientRepositoryInterface,
+    @Inject(CLIENT_LOOKUP)
+    private readonly clientLookup: ClientLookupPort,
     @Inject(BUDGET_DELIVERY_NOTIFIER)
     private readonly budgetDelivery: BudgetDeliveryNotifier,
     @Inject(STOCK_SERVICE)
@@ -38,16 +39,16 @@ export class GenerateBudgetUseCase {
 
   async execute(id: string): Promise<ServiceOrder> {
     const order = await this.orderRepo.findById(id);
-    if (!order) throw new NotFoundException('Service order not found');
+    if (!order) throw new EntityNotFoundError('Service order not found');
 
     if (!order.diagnosis?.trim()) {
-      throw new BadRequestException(
+      throw new BusinessRuleViolationError(
         'Registre o diagnóstico antes de gerar o orçamento',
       );
     }
 
     if (order.serviceLines.length + order.partLines.length === 0) {
-      throw new BadRequestException(
+      throw new BusinessRuleViolationError(
         'Cannot generate budget without service or part lines',
       );
     }
@@ -117,7 +118,7 @@ export class GenerateBudgetUseCase {
     try {
       order.applyBudget(budget);
     } catch (e) {
-      throw new BadRequestException(
+      throw new BusinessRuleViolationError(
         e instanceof Error ? e.message : 'Invalid operation',
       );
     }
@@ -127,9 +128,9 @@ export class GenerateBudgetUseCase {
     const becameWaitingApproval =
       statusBeforeApply !== ServiceOrderStatus.WAITING_APPROVAL;
     if (saved?.budget && becameWaitingApproval) {
-      const client = await this.clientRepo.findById(saved.clientId);
+      const client = await this.clientLookup.findById(saved.clientId);
       if (!client) {
-        throw new NotFoundException(`Client "${saved.clientId}" not found`);
+        throw new EntityNotFoundError(`Client "${saved.clientId}" not found`);
       }
       await this.budgetDelivery.notifyBudgetReady({
         serviceOrderId: saved.id,

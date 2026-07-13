@@ -19,5 +19,6 @@ import { IdentidadeDatabaseModule } from '../database/database.module';
     UpdatedVehicleUseCase,
   ],
   controllers: [VehicleController],
+  exports: [CreateVehicleUseCase, IdentidadeDatabaseModule],
 })
 export class VehicleModule {}

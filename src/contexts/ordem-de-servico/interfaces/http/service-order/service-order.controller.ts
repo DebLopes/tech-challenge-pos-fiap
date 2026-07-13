@@ -38,6 +38,7 @@ import { RegisterDiagnosisRequestDto } from './dtos/register-diagnosis-request.d
 import { OpenServiceOrderRequestDto } from './dtos/open-service-order-request.dto';
 import { RejectBudgetRequestDto } from './dtos/reject-budget-request.dto';
 import { ServiceOrderResponseDto } from './dtos/service-order-response.dto';
+import { ServiceOrderRequestMapper } from './mappers/service-order-request.mapper';
 
 @ApiTags('Ordem de Serviço / Ordens (interno)')
 @ApiBearerAuth()
@@ -66,11 +67,9 @@ export class ServiceOrderController {
   async create(
     @Body() dto: CreateServiceOrderRequestDto,
   ): Promise<ServiceOrderResponseDto> {
-    const order = await this.createOrder.execute({
-      clientId: dto.clientId,
-      vehicleId: dto.vehicleId,
-      requestedServicesDescription: dto.requestedServicesDescription,
-    });
+    const order = await this.createOrder.execute(
+      ServiceOrderRequestMapper.toCreateInput(dto),
+    );
     return ServiceOrderResponseDto.toDto(order);
   }
 
@@ -85,13 +84,9 @@ export class ServiceOrderController {
   async open(
     @Body() dto: OpenServiceOrderRequestDto,
   ): Promise<ServiceOrderResponseDto> {
-    const order = await this.openOrder.execute({
-      client: dto.client,
-      vehicle: dto.vehicle,
-      requestedServicesDescription: dto.requestedServicesDescription,
-      services: dto.services,
-      parts: dto.parts,
-    });
+    const order = await this.openOrder.execute(
+      ServiceOrderRequestMapper.toOpenInput(dto),
+    );
     return ServiceOrderResponseDto.toDto(order);
   }
 

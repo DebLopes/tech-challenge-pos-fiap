@@ -1,11 +1,12 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { BusinessRuleViolationError } from '../../../../shared/domain/errors';
 import { CatalogService } from '../../../domain/entities/catalog-service';
 import type { CatalogServiceRepositoryInterface } from '../../../domain/repositories/catalog-service.repository';
-import type { ProductRepositoryInterface } from '../../../domain/repositories/product.repository';
+import { CATALOG_SERVICE_REPOSITORY } from '../../../domain/repositories/tokens';
 import {
-  CATALOG_SERVICE_REPOSITORY,
-  PRODUCT_REPOSITORY,
-} from '../../../domain/repositories/tokens';
+  PRODUCT_LOOKUP,
+  type ProductLookupPort,
+} from '../../../domain/services/product-lookup.port';
 import type { CreateCatalogServiceInput } from './catalog-service.inputs';
 
 @Injectable()
@@ -13,8 +14,8 @@ export class CreateCatalogServiceUseCase {
   constructor(
     @Inject(CATALOG_SERVICE_REPOSITORY)
     private readonly catalogRepo: CatalogServiceRepositoryInterface,
-    @Inject(PRODUCT_REPOSITORY)
-    private readonly productRepo: ProductRepositoryInterface,
+    @Inject(PRODUCT_LOOKUP)
+    private readonly productLookup: ProductLookupPort,
   ) {}
 
   async execute(input: CreateCatalogServiceInput): Promise<CatalogService> {
@@ -38,7 +39,7 @@ export class CreateCatalogServiceUseCase {
     } catch (e) {
       const message =
         e instanceof Error ? e.message : 'Invalid catalog service';
-      throw new BadRequestException(message);
+      throw new BusinessRuleViolationError(message);
     }
 
     return this.catalogRepo.create(entity);
@@ -46,9 +47,9 @@ export class CreateCatalogServiceUseCase {
 
   private async assertProductsExist(codes: string[]): Promise<void> {
     for (const code of codes) {
-      const product = await this.productRepo.findByCodeOrNull(code);
+      const product = await this.productLookup.findByCodeOrNull(code);
       if (!product) {
-        throw new BadRequestException(
+        throw new BusinessRuleViolationError(
           `Product with code "${code}" not found. Register the product before linking.`,
         );
       }
