@@ -44,6 +44,39 @@ describe('ServiceOrder (domínio)', () => {
     expect(so.statusHistory[0].to).toBe(ServiceOrderStatus.RECEIVED);
   });
 
+  it('create with initial service and part lines stays RECEIVED', () => {
+    const so = ServiceOrder.create({
+      client: {
+        id: 'c1',
+        document: '529.982.247-25',
+        name: 'Maria',
+      },
+      vehicle: {
+        id: 'v1',
+        plate: 'APL-1234',
+        brand: 'Fiat',
+        model: 'Uno',
+        year: 2015,
+      },
+      serviceLines: [
+        {
+          catalogServiceId: 'cs-1',
+          name: 'Troca óleo',
+          unitPrice: 80,
+          quantity: 1,
+          defaultParts: [{ productCode: 'P1', name: 'Óleo', quantity: 1 }],
+        },
+      ],
+      partLines: [{ productCode: 'P2', name: 'Filtro', quantity: 2 }],
+    });
+
+    expect(so.status).toBe(ServiceOrderStatus.RECEIVED);
+    expect(so.statusHistory).toHaveLength(1);
+    expect(so.serviceLines).toHaveLength(1);
+    expect(so.partLines).toHaveLength(1);
+    expect(so.partLines[0].productCode).toBe('P2');
+  });
+
   it('registerDiagnosis trims and transitions to IN_DIAGNOSIS', () => {
     const so = newOrder();
     so.registerDiagnosis('  ok  ');

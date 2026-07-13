@@ -24,6 +24,7 @@ import {
   GetAllServiceOrdersUseCase,
   GetAverageExecutionTimeUseCase,
   GetServiceOrderUseCase,
+  OpenServiceOrderUseCase,
   RegisterDiagnosisUseCase,
   RejectBudgetUseCase,
 } from '../../../application/use-case/service-order';
@@ -34,6 +35,7 @@ import { AddServiceToOrderRequestDto } from './dtos/add-service-to-order-request
 import { AverageExecutionTimeResponseDto } from './dtos/average-execution-time-response.dto';
 import { CreateServiceOrderRequestDto } from './dtos/create-service-order-request.dto';
 import { RegisterDiagnosisRequestDto } from './dtos/register-diagnosis-request.dto';
+import { OpenServiceOrderRequestDto } from './dtos/open-service-order-request.dto';
 import { RejectBudgetRequestDto } from './dtos/reject-budget-request.dto';
 import { ServiceOrderResponseDto } from './dtos/service-order-response.dto';
 
@@ -43,6 +45,7 @@ import { ServiceOrderResponseDto } from './dtos/service-order-response.dto';
 export class ServiceOrderController {
   constructor(
     private readonly createOrder: CreateServiceOrderUseCase,
+    private readonly openOrder: OpenServiceOrderUseCase,
     private readonly getOrder: GetServiceOrderUseCase,
     private readonly getAllOrders: GetAllServiceOrdersUseCase,
     private readonly registerDiagnosis: RegisterDiagnosisUseCase,
@@ -67,6 +70,27 @@ export class ServiceOrderController {
       clientId: dto.clientId,
       vehicleId: dto.vehicleId,
       requestedServicesDescription: dto.requestedServicesDescription,
+    });
+    return ServiceOrderResponseDto.toDto(order);
+  }
+
+  @Post('open')
+  @AuthRoles(UserRole.ADMIN, UserRole.ATENDENTE)
+  @ApiOperation({
+    summary: 'Abrir ordem de servico em uma unica chamada',
+    description:
+      'Recebe cliente, veiculo, servicos e pecas no mesmo body e retorna a OS criada com seu id. Cliente e veiculo sao reaproveitados quando o documento/placa ja existirem; caso contrario, sao criados. Nao substitui o POST /service-orders (criacao por ids).',
+  })
+  @ApiResponse({ status: 201, type: ServiceOrderResponseDto })
+  async open(
+    @Body() dto: OpenServiceOrderRequestDto,
+  ): Promise<ServiceOrderResponseDto> {
+    const order = await this.openOrder.execute({
+      client: dto.client,
+      vehicle: dto.vehicle,
+      requestedServicesDescription: dto.requestedServicesDescription,
+      services: dto.services,
+      parts: dto.parts,
     });
     return ServiceOrderResponseDto.toDto(order);
   }
