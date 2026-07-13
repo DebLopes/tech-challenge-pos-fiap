@@ -50,8 +50,19 @@ export class MongodbServiceOrderRepository implements ServiceOrderRepositoryInte
 
   async find(): Promise<ServiceOrder[]> {
     const rows = await this.serviceOrderModel
-      .find({ status: { $ne: ServiceOrderStatus.CANCELLED } }, { __v: false })
-      .sort({ createdAt: -1 })
+      .find(
+        {
+          status: {
+            $nin: [
+              ServiceOrderStatus.DELIVERED,
+              ServiceOrderStatus.FINISHED,
+              ServiceOrderStatus.CANCELLED,
+            ],
+          },
+        },
+        { __v: false },
+      )
+      .sort({ createdAt: 1 })
       .lean()
       .exec();
     return rows.map((r) => hydrateServiceOrderDoc(r));
