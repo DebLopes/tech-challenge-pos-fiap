@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { Vehicle } from '../../../domain/entities/vehicle';
 import { VehicleRepositoryInterface } from '../../../domain/repositories/vehicle.repository';
-import { PlateVO } from '../../../domain/value-objects/plate.vo';
+import { PlateVO } from '../../../../shared/domain/value-objects/plate.vo';
 import { CreateVehicleUseCase } from './create-vehicle';
 import { DeleteVehicleUseCase } from './delete-vehicle';
 import { GetAllVehiclesUseCase } from './get-all-vehicles';

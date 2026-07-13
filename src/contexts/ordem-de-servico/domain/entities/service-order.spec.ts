@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { Money } from '../../../shared/domain/value-objects/money.vo';
-import { DocumentVO } from '../../../identidade/domain/value-objects/document.vo';
-import { PlateVO } from '../../../identidade/domain/value-objects/plate.vo';
+import { DocumentVO } from '../../../shared/domain/value-objects/document.vo';
+import { PlateVO } from '../../../shared/domain/value-objects/plate.vo';
 import { ServiceOrder, type Budget } from './service-order';
 import { ServiceOrderStatus } from './service-order-status';
 

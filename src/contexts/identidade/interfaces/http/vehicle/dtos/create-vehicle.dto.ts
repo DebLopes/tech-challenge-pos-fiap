@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { IsPlate } from '../../shared/validators/is-plate.validator';
+import { IsPlate } from '../../../../../shared/interfaces/http/validators/is-plate.validator';
 
 export class CreateVehicleDto {
   @ApiProperty({

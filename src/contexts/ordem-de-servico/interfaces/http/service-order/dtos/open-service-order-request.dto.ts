@@ -11,8 +11,8 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { IsCPFOrCNPJ } from '../../../../../identidade/interfaces/http/shared/validators/is-cpf-or-cnpj.validator';
-import { IsPlate } from '../../../../../identidade/interfaces/http/shared/validators/is-plate.validator';
+import { IsCPFOrCNPJ } from '../../../../../shared/interfaces/http/validators/is-cpf-or-cnpj.validator';
+import { IsPlate } from '../../../../../shared/interfaces/http/validators/is-plate.validator';
 
 class OpenServiceOrderClientDto {
   @ApiProperty({ description: 'Nome do cliente', example: 'João Silva' })

@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
-import { DocumentVO } from '../../../identidade/domain/value-objects/document.vo';
-import { PlateVO } from '../../../identidade/domain/value-objects/plate.vo';
+import { DocumentVO } from '../../../shared/domain/value-objects/document.vo';
+import { PlateVO } from '../../../shared/domain/value-objects/plate.vo';
 import { Money } from '../../../shared/domain/value-objects/money.vo';
 import { EDITABLE_STATUSES, ServiceOrderStatus } from './service-order-status';
 

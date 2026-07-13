@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { IsPlate } from '../../../../../identidade/interfaces/http/shared/validators/is-plate.validator';
+import { IsPlate } from '../../../../../shared/interfaces/http/validators/is-plate.validator';
 
 export class ServiceOrderVehicleSnapshotResponseDto {
   @ApiProperty({

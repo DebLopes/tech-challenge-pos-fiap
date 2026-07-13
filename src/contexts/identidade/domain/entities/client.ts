@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { DocumentVO } from '../value-objects/document.vo';
+import { DocumentVO } from '../../../shared/domain/value-objects/document.vo';
 import { EmailVO } from '../value-objects/email.vo';
 
 export type ClientProps = {

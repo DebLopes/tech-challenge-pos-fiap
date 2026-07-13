@@ -1,5 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { PlateVO } from '../../../../domain/value-objects/plate.vo';
+import { PlateVO } from '../../../domain/value-objects/plate.vo';
 
 export function IsPlate(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
