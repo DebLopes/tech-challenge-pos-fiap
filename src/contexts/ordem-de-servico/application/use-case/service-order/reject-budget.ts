@@ -1,9 +1,8 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+  BusinessRuleViolationError,
+  EntityNotFoundError,
+} from '../../../../shared/domain/errors';
 import { ServiceOrder } from '../../../domain/entities/service-order';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
 import { SERVICE_ORDER_REPOSITORY } from '../../../domain/repositories/tokens';
@@ -17,11 +16,11 @@ export class RejectBudgetUseCase {
 
   async execute(id: string, reason?: string): Promise<ServiceOrder> {
     const order = await this.orderRepo.findById(id);
-    if (!order) throw new NotFoundException('Service order not found');
+    if (!order) throw new EntityNotFoundError('Service order not found');
     try {
       order.rejectBudget(reason);
     } catch (e) {
-      throw new BadRequestException(
+      throw new BusinessRuleViolationError(
         e instanceof Error ? e.message : 'Invalid operation',
       );
     }

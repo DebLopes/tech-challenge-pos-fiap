@@ -1,4 +1,5 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../shared/domain/errors';
 import type { Budget } from '../../../domain/entities/service-order';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
 import { SERVICE_ORDER_REPOSITORY } from '../../../domain/repositories/tokens';
@@ -27,7 +28,7 @@ export class GetPublicServiceOrderBudgetUseCase {
     );
 
     if (!order.budget) {
-      throw new NotFoundException(PUBLIC_SERVICE_ORDER_ACCESS_DENIED);
+      throw new EntityNotFoundError(PUBLIC_SERVICE_ORDER_ACCESS_DENIED);
     }
 
     return order.budget;

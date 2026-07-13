@@ -1,4 +1,5 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { UnauthorizedError } from '../../../../shared/domain/errors';
 import type { UserRepositoryInterface } from '../../../domain/repositories/user.repository';
 import { USER_REPOSITORY } from '../../../domain/repositories/tokens';
 import type { JwtPayload } from './jwt-payload';
@@ -13,7 +14,7 @@ export class ValidateUserUseCase {
   async execute(payload: JwtPayload): Promise<JwtPayload> {
     const user = await this.users.findById(payload.sub);
     if (!user?.active) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedError('Unauthorized');
     }
 
     return {

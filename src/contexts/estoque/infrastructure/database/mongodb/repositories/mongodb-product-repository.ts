@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../../shared/domain/errors';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -49,7 +49,7 @@ export class MongodbProductRepository implements ProductRepositoryInterface {
     const product = await this.productModel.findOne({ code });
 
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new EntityNotFoundError('Product not found');
     }
 
     return this.toDomain(product);
@@ -66,7 +66,7 @@ export class MongodbProductRepository implements ProductRepositoryInterface {
     );
 
     if (!updated) {
-      throw new NotFoundException('Product not found');
+      throw new EntityNotFoundError('Product not found');
     }
 
     return this.toDomain(updated);

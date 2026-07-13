@@ -1,8 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../../shared/domain/errors';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Vehicle } from '../../../../domain/entities/vehicle';
-import { PlateVO } from '../../../../domain/value-objects/plate.vo';
+import { PlateVO } from '../../../../../shared/domain/value-objects/plate.vo';
 import { VehicleRepositoryInterface } from '../../../../domain/repositories/vehicle.repository';
 import { VehicleModel } from '../models/vehicle/vehicle.model';
 
@@ -53,7 +53,7 @@ export class MongodbVehicleRepository implements VehicleRepositoryInterface {
     const veh = await this.vehicleModel.findOne({ plate: plateKey });
 
     if (!veh) {
-      throw new NotFoundException('Vehicle not found');
+      throw new EntityNotFoundError('Vehicle not found');
     }
 
     return this.toDomain(veh);
@@ -71,7 +71,7 @@ export class MongodbVehicleRepository implements VehicleRepositoryInterface {
     );
 
     if (!updated) {
-      throw new NotFoundException('Vehicle not found');
+      throw new EntityNotFoundError('Vehicle not found');
     }
 
     return this.toDomain(updated);

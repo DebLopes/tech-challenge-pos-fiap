@@ -1,4 +1,5 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { UnauthorizedError } from '../../../../shared/domain/errors';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import type { UserRepositoryInterface } from '../../../domain/repositories/user.repository';
@@ -22,12 +23,12 @@ export class LoginUseCase {
     const email = input.email.toLowerCase();
     const user = await this.users.findByEmail(email);
     if (!user?.active) {
-      throw new UnauthorizedException('Credenciais inválidas');
+      throw new UnauthorizedError('Credenciais inválidas');
     }
 
     const ok = await bcrypt.compare(input.password, user.passwordHash);
     if (!ok) {
-      throw new UnauthorizedException('Credenciais inválidas');
+      throw new UnauthorizedError('Credenciais inválidas');
     }
 
     const payload: JwtPayload = {

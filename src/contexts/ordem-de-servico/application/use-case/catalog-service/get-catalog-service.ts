@@ -1,4 +1,5 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../shared/domain/errors';
 import { CatalogService } from '../../../domain/entities/catalog-service';
 import type { CatalogServiceRepositoryInterface } from '../../../domain/repositories/catalog-service.repository';
 import { CATALOG_SERVICE_REPOSITORY } from '../../../domain/repositories/tokens';
@@ -13,7 +14,7 @@ export class GetCatalogServiceUseCase {
   async execute(id: string): Promise<CatalogService> {
     const doc = await this.catalogRepo.findById(id);
     if (!doc) {
-      throw new NotFoundException('Catalog service not found');
+      throw new EntityNotFoundError('Catalog service not found');
     }
     return doc;
   }
