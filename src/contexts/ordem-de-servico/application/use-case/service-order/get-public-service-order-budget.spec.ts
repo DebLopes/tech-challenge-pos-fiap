@@ -1,10 +1,13 @@
 import { describe, expect, it } from '@jest/globals';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BusinessRuleViolationError,
+  EntityNotFoundError,
+} from '../../../../shared/domain/errors';
 import { ServiceOrder } from '../../../domain/entities/service-order';
 import { ServiceOrderStatus } from '../../../domain/entities/service-order-status';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
-import { DocumentVO } from '../../../../identidade/domain/value-objects/document.vo';
-import { PlateVO } from '../../../../identidade/domain/value-objects/plate.vo';
+import { DocumentVO } from '../../../../shared/domain/value-objects/document.vo';
+import { PlateVO } from '../../../../shared/domain/value-objects/plate.vo';
 import { GetPublicServiceOrderBudgetUseCase } from './get-public-service-order-budget';
 
 class StubOrderRepo implements ServiceOrderRepositoryInterface {
@@ -127,7 +130,7 @@ describe('GetPublicServiceOrderBudgetUseCase', () => {
       new StubOrderRepo(baseOrder()),
     );
     await expect(uc.execute('os-1', '   ')).rejects.toBeInstanceOf(
-      BadRequestException,
+      BusinessRuleViolationError,
     );
   });
 
@@ -136,7 +139,7 @@ describe('GetPublicServiceOrderBudgetUseCase', () => {
       new StubOrderRepo(baseOrder()),
     );
     await expect(uc.execute('outro-id', '87075443089')).rejects.toBeInstanceOf(
-      NotFoundException,
+      EntityNotFoundError,
     );
   });
 
@@ -145,7 +148,7 @@ describe('GetPublicServiceOrderBudgetUseCase', () => {
       new StubOrderRepo(baseOrder()),
     );
     await expect(uc.execute('os-1', '11111111111')).rejects.toBeInstanceOf(
-      NotFoundException,
+      EntityNotFoundError,
     );
   });
 
@@ -155,7 +158,7 @@ describe('GetPublicServiceOrderBudgetUseCase', () => {
     );
     await expect(
       uc.execute('os-1', '87075443089', 'ABC1D23'),
-    ).rejects.toBeInstanceOf(NotFoundException);
+    ).rejects.toBeInstanceOf(EntityNotFoundError);
   });
 
   it('404 quando não há orçamento gerado', async () => {
@@ -163,7 +166,7 @@ describe('GetPublicServiceOrderBudgetUseCase', () => {
       new StubOrderRepo(orderWithoutBudget()),
     );
     await expect(uc.execute('os-1', '87075443089')).rejects.toBeInstanceOf(
-      NotFoundException,
+      EntityNotFoundError,
     );
   });
 });

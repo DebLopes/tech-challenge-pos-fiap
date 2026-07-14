@@ -8,10 +8,10 @@ import {
 } from '../../application/use-case/catalog-service';
 import { CatalogServiceController } from '../../interfaces/http/catalog-service/catalog-service.controller';
 import { CatalogServiceDatabaseModule } from '../database/catalog-service-database.module';
-import { EstoqueModule } from '../../../shared/infrastructure/ioc/estoque.module';
+import { OrdemDeServicoAdaptersModule } from '../adapters/adapters.module';
 
 @Module({
-  imports: [CatalogServiceDatabaseModule, EstoqueModule],
+  imports: [CatalogServiceDatabaseModule, OrdemDeServicoAdaptersModule],
   providers: [
     CreateCatalogServiceUseCase,
     GetAllCatalogServicesUseCase,

@@ -6,7 +6,7 @@ import {
   GetProductBatchUseCase,
   GetProductStockUseCase,
 } from '../../application/use-case/product-batch';
-import { STOCK_SERVICE } from '../../../shared/domain/services/stock-service.port';
+import { STOCK_SERVICE } from '../../../shared/domain/ports/stock-service.port';
 import { ProductBatchController } from '../../interfaces/http/product-batch/product-batch.controller';
 import { EstoqueDatabaseModule } from '../database/database.module';
 import { ProductBatchStockService } from '../stock/product-batch-stock.service';

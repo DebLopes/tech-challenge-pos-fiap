@@ -1,5 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { DocumentVO } from '../../../../domain/value-objects/document.vo';
+import { DocumentVO } from '../../../domain/value-objects/document.vo';
 
 export function IsCPFOrCNPJ(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {

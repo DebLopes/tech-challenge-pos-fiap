@@ -13,3 +13,10 @@ export const EDITABLE_STATUSES: ServiceOrderStatus[] = [
   ServiceOrderStatus.IN_DIAGNOSIS,
   ServiceOrderStatus.WAITING_APPROVAL,
 ];
+
+export const SERVICE_ORDER_LISTING_ORDER: ServiceOrderStatus[] = [
+  ServiceOrderStatus.IN_EXECUTION,
+  ServiceOrderStatus.WAITING_APPROVAL,
+  ServiceOrderStatus.IN_DIAGNOSIS,
+  ServiceOrderStatus.RECEIVED,
+];

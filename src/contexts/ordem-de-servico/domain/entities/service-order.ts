@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
-import { DocumentVO } from '../../../identidade/domain/value-objects/document.vo';
-import { PlateVO } from '../../../identidade/domain/value-objects/plate.vo';
+import { DocumentVO } from '../../../shared/domain/value-objects/document.vo';
+import { PlateVO } from '../../../shared/domain/value-objects/plate.vo';
 import { Money } from '../../../shared/domain/value-objects/money.vo';
 import { EDITABLE_STATUSES, ServiceOrderStatus } from './service-order-status';
 
@@ -105,6 +105,8 @@ export type CreateServiceOrderInput = {
     year: number;
   };
   requestedServicesDescription?: string;
+  serviceLines?: Omit<ServiceOrderServiceLine, 'id'>[];
+  partLines?: Omit<ServiceOrderPartLine, 'id'>[];
 };
 
 export class ServiceOrder {
@@ -134,8 +136,12 @@ export class ServiceOrder {
           year: input.vehicle.year,
         },
         requestedServicesDescription: input.requestedServicesDescription,
-        serviceLines: [],
-        partLines: [],
+        serviceLines: (input.serviceLines ?? []).map((line) =>
+          ServiceOrder.buildServiceLine(line),
+        ),
+        partLines: (input.partLines ?? []).map((line) =>
+          ServiceOrder.buildPartLine(line),
+        ),
         statusHistory: [
           { from: null, to: ServiceOrderStatus.RECEIVED, at: now },
         ],
@@ -271,11 +277,10 @@ export class ServiceOrder {
     }
   }
 
-  addServiceLine(
+  private static buildServiceLine(
     line: Omit<ServiceOrderServiceLine, 'id'>,
     id: string = randomUUID(),
-  ): ServiceOrderServiceLine {
-    this.assertEditable();
+  ): ServiceOrderServiceLineStored {
     if (!line.name?.trim()) {
       throw new Error('Service line name is required');
     }
@@ -283,7 +288,7 @@ export class ServiceOrder {
     if (line.quantity <= 0) {
       throw new Error('Service line quantity must be > 0');
     }
-    const created: ServiceOrderServiceLineStored = {
+    return {
       id,
       catalogServiceId: line.catalogServiceId,
       name: line.name.trim(),
@@ -295,6 +300,32 @@ export class ServiceOrder {
         quantity: p.quantity,
       })),
     };
+  }
+
+  private static buildPartLine(
+    line: Omit<ServiceOrderPartLine, 'id'>,
+    id: string = randomUUID(),
+  ): ServiceOrderPartLine {
+    if (line.quantity <= 0) {
+      throw new Error('Part line quantity must be > 0');
+    }
+    if (!line.productCode?.trim()) {
+      throw new Error('Part line productCode is required');
+    }
+    return {
+      id,
+      productCode: line.productCode.toUpperCase(),
+      name: line.name,
+      quantity: line.quantity,
+    };
+  }
+
+  addServiceLine(
+    line: Omit<ServiceOrderServiceLine, 'id'>,
+    id: string = randomUUID(),
+  ): ServiceOrderServiceLine {
+    this.assertEditable();
+    const created = ServiceOrder.buildServiceLine(line, id);
     this.props.serviceLines.push(created);
     this.invalidateBudget();
     this.autoTransitionToDiagnosisIfReceived();
@@ -314,18 +345,7 @@ export class ServiceOrder {
     id: string = randomUUID(),
   ): ServiceOrderPartLine {
     this.assertEditable();
-    if (line.quantity <= 0) {
-      throw new Error('Part line quantity must be > 0');
-    }
-    if (!line.productCode?.trim()) {
-      throw new Error('Part line productCode is required');
-    }
-    const created: ServiceOrderPartLine = {
-      id,
-      productCode: line.productCode.toUpperCase(),
-      name: line.name,
-      quantity: line.quantity,
-    };
+    const created = ServiceOrder.buildPartLine(line, id);
     this.props.partLines.push(created);
     this.invalidateBudget();
     this.autoTransitionToDiagnosisIfReceived();

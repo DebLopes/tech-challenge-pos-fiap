@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { Money } from '../../../shared/domain/value-objects/money.vo';
-import { DocumentVO } from '../../../identidade/domain/value-objects/document.vo';
-import { PlateVO } from '../../../identidade/domain/value-objects/plate.vo';
+import { DocumentVO } from '../../../shared/domain/value-objects/document.vo';
+import { PlateVO } from '../../../shared/domain/value-objects/plate.vo';
 import { ServiceOrder, type Budget } from './service-order';
 import { ServiceOrderStatus } from './service-order-status';
 
@@ -42,6 +42,39 @@ describe('ServiceOrder (domínio)', () => {
     expect(so.isInExecution()).toBe(false);
     expect(so.statusHistory).toHaveLength(1);
     expect(so.statusHistory[0].to).toBe(ServiceOrderStatus.RECEIVED);
+  });
+
+  it('create with initial service and part lines stays RECEIVED', () => {
+    const so = ServiceOrder.create({
+      client: {
+        id: 'c1',
+        document: '529.982.247-25',
+        name: 'Maria',
+      },
+      vehicle: {
+        id: 'v1',
+        plate: 'APL-1234',
+        brand: 'Fiat',
+        model: 'Uno',
+        year: 2015,
+      },
+      serviceLines: [
+        {
+          catalogServiceId: 'cs-1',
+          name: 'Troca óleo',
+          unitPrice: 80,
+          quantity: 1,
+          defaultParts: [{ productCode: 'P1', name: 'Óleo', quantity: 1 }],
+        },
+      ],
+      partLines: [{ productCode: 'P2', name: 'Filtro', quantity: 2 }],
+    });
+
+    expect(so.status).toBe(ServiceOrderStatus.RECEIVED);
+    expect(so.statusHistory).toHaveLength(1);
+    expect(so.serviceLines).toHaveLength(1);
+    expect(so.partLines).toHaveLength(1);
+    expect(so.partLines[0].productCode).toBe('P2');
   });
 
   it('registerDiagnosis trims and transitions to IN_DIAGNOSIS', () => {

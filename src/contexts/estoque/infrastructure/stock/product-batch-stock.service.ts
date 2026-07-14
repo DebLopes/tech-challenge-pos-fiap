@@ -8,7 +8,7 @@ import type {
   StockDemandItem,
   StockQuoteItem,
   StockServicePort,
-} from '../../../shared/domain/services/stock-service.port';
+} from '../../../shared/domain/ports/stock-service.port';
 import { DecreaseProductStockUseCase } from '../../application/use-case/product-batch/decrease-product-stock';
 
 @Injectable()

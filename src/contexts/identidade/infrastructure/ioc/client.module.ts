@@ -19,5 +19,6 @@ import { IdentidadeDatabaseModule } from '../database/database.module';
     DeleteClientUseCase,
   ],
   controllers: [ClientController],
+  exports: [CreateClientUseCase, IdentidadeDatabaseModule],
 })
 export class ClientModule {}

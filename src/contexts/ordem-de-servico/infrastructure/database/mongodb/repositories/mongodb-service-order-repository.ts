@@ -1,8 +1,8 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ServiceOrder } from '../../../../domain/entities/service-order';
-import { DocumentVO } from '../../../../../identidade/domain/value-objects/document.vo';
-import { PlateVO } from '../../../../../identidade/domain/value-objects/plate.vo';
+import { DocumentVO } from '../../../../../shared/domain/value-objects/document.vo';
+import { PlateVO } from '../../../../../shared/domain/value-objects/plate.vo';
 import { ServiceOrderStatus } from '../../../../domain/entities/service-order-status';
 import { ServiceOrderRepositoryInterface } from '../../../../domain/repositories/service-order.repository';
 import { ServiceOrderModel } from '../models/service-order/service-order.model';
@@ -50,8 +50,19 @@ export class MongodbServiceOrderRepository implements ServiceOrderRepositoryInte
 
   async find(): Promise<ServiceOrder[]> {
     const rows = await this.serviceOrderModel
-      .find({ status: { $ne: ServiceOrderStatus.CANCELLED } }, { __v: false })
-      .sort({ createdAt: -1 })
+      .find(
+        {
+          status: {
+            $nin: [
+              ServiceOrderStatus.DELIVERED,
+              ServiceOrderStatus.FINISHED,
+              ServiceOrderStatus.CANCELLED,
+            ],
+          },
+        },
+        { __v: false },
+      )
+      .sort({ createdAt: 1 })
       .lean()
       .exec();
     return rows.map((r) => hydrateServiceOrderDoc(r));

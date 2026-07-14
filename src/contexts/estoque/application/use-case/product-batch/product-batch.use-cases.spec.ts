@@ -1,5 +1,5 @@
-import { NotFoundException } from '@nestjs/common';
 import { describe, expect, it } from '@jest/globals';
+import { EntityNotFoundError } from '../../../../shared/domain/errors';
 import { Product } from '../../../domain/entities/product';
 import {
   ProductBatch,
@@ -25,7 +25,7 @@ class InMemoryProductRepository implements ProductRepositoryInterface {
   }
   findByCode(code: string): Promise<Product> {
     const p = this.products.get(code);
-    if (!p) throw new NotFoundException();
+    if (!p) throw new EntityNotFoundError('Product not found');
     return Promise.resolve(p);
   }
   updateByCode(): Promise<Product> {
@@ -70,7 +70,7 @@ class InMemoryProductBatchRepository implements ProductBatchRepositoryInterface 
   ): Promise<ProductBatch> {
     const current = this.batches.get(id);
     if (!current) {
-      throw new NotFoundException('ProductBatch not found');
+      throw new EntityNotFoundError('ProductBatch not found');
     }
     const merged = ProductBatch.create(
       {
@@ -125,7 +125,7 @@ describe('Product batch use cases', () => {
         costPrice: 50,
         salePrice: 90,
       }),
-    ).rejects.toBeInstanceOf(NotFoundException);
+    ).rejects.toBeInstanceOf(EntityNotFoundError);
   });
 
   it('gets batches by product code', async () => {

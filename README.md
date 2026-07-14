@@ -1,148 +1,110 @@
 # Tech Challenge Pós FIAP — Oficina
 
-API de oficina mecânica: ordens de serviço, clientes, veículos, catálogo, produtos, estoque e rotas públicas para orçamento/status. **NestJS**, **TypeScript**, **MongoDB**, **JWT** e **Swagger** em **`/api`**.
+API de oficina mecânica (ordens de serviço, clientes, veículos, catálogo, produtos e estoque), construída como um **monólito modular** em **NestJS + TypeScript + MongoDB**, com **JWT** e **Swagger** em `/api`, e deploy em **Kubernetes**.
 
-
-## Como rodar o projeto com Docker Compose
-
-### Requisitos
-
-- **Docker** — criar e gerir contêineres.
-- **Docker Compose** — subir API e Mongo juntos.
-- **Node.js** (recomendado via [nvm](https://github.com/nvm-sh/nvm), versão em [.nvmrc](.nvmrc)) e **Yarn** — para instalar dependências e correr **`yarn migrate:up`** na tua máquina (as migrations ligam ao Mongo em `localhost:27017`).
-
-### Execução
-
-1. **Clonar** o repositório na tua máquina:
-
-   SSH:
-
-   ```bash
-   git clone git@github.com:SEU_USUARIO/tech-challenge-pos-fiap.git
-   ```
-
-   HTTPS:
-
-   ```bash
-   git clone https://github.com/SEU_USUARIO/tech-challenge-pos-fiap.git
-   ```
-
-2. **Entrar na pasta** do projeto:
-
-   ```bash
-   cd tech-challenge-pos-fiap
-   ```
-
-3. **Ativar a versão de Node** do projeto (se usares nvm):
-
-   ```bash
-   nvm use
-   ```
-
-   Se a versão ainda não existir: `nvm install` e depois `nvm use`.
-
-4. **Instalar dependências:**
-
-   ```bash
-   yarn install
-   ```
-
-5. **Criar o ficheiro de ambiente** a partir do exemplo:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   O `.env` deve ter `MONGO_URL` apontando para o Mongo no host (ex.: `mongodb://localhost:27017/techChallenge`), para a API no host e para as migrations — ver comentários em [.env.example](.env.example).
-
-6. **Subir os serviços** (API + Mongo em segundo plano, com rebuild se necessário):
-
-   ```bash
-   docker compose up -d --build
-   ```
-
-   Em ambientes mais antigos, o equivalente pode ser: `docker-compose up -d --build`.
-
-7. **Aplicar migrations** (dados iniciais na base), **na máquina**, com o mesmo `MONGO_URL` do `.env`:
-
-   ```bash
-   yarn migrate:up
-   ```
-
-**Depois de subir**
-
-- API: **http://localhost:3000**
-- **Documentação interativa (Swagger):** **http://localhost:3000/api**
-- Utilizador seed (login): `admin@local.dev` / `admin123`
+Este README é um **índice**. A documentação detalhada está organizada por fase na pasta [`readme/`](readme) e os diagramas na pasta [`docs/`](docs).
 
 ---
 
-## Execução local sem Docker (API na máquina)
+## Documentação por fase
 
-1. Segue os passos **1 a 5** da secção anterior (clone, `cd`, `nvm use`, `yarn install`, `cp .env.example .env`).
-2. Garante **Node** (via nvm ou instalador oficial) e **Yarn**.
-3. **MongoDB** acessível na porta **27017**, por exemplo só o Mongo com Docker:
-
-   ```bash
-   docker compose up -d mongo
-   ```
-
-   ou:
-
-   ```bash
-   docker run -d --name mongo-dev -p 27017:27017 mongo:7
-   ```
-
-4. **Migrations** e **arranque em modo desenvolvimento:**
-
-   ```bash
-   yarn migrate:up
-   yarn start:dev
-   ```
-
-5. Abre o Swagger: **http://localhost:3000/api**
+| Fase | Conteúdo | Link |
+|------|----------|------|
+| **Fase 1** | A aplicação: como rodar (Docker Compose / local), APIs, tecnologias e justificativa do MongoDB. Diagrama de componentes do monólito modular. | [`readme/fase-1.md`](readme/fase-1.md) |
+| **Fase 2** | Infraestrutura e deploy em Kubernetes (passo a passo): Docker, Terraform/Kind, manifestos `k8s/`, migrations, HPA e CI/CD. | [`readme/fase-2.md`](readme/fase-2.md) |
 
 ---
 
-## Documentação das APIs
+## Arquitetura proposta
 
-A referência completa dos endpoints, corpos de pedido e respostas está no **Swagger/OpenAPI** em:
+Três diagramas separados (Mermaid) em [`docs/diagrams/`](docs/diagrams):
 
-**http://localhost:3000/api**
+### Componentes da aplicação
 
-Lá podes testar rotas com JWT (botão *Authorize*, token do `POST /auth/login`) e as rotas públicas sob **`/public/...`**.
+Monólito modular NestJS organizado por *bounded contexts* (`identidade`, `estoque`, `ordem-de-servico`) e um `shared` com value objects, validators e erros de domínio. O contexto `ordem-de-servico` conversa com os demais por meio de uma camada anticorrupção (ports/adapters), sem acoplamento direto.
 
-### Tecnologias utilizadas
+Diagrama: [`docs/diagrams/componentes-aplicacao.md`](docs/diagrams/componentes-aplicacao.md)
 
-- Node.js, TypeScript  
-- NestJS, Mongoose, Passport/JWT  
-- MongoDB  
-- Docker e Docker Compose  
-- migrate-mongo (migrations)
+### Infraestrutura provisionada
 
-### Visão geral dos recursos (detalhe no Swagger)
+Cluster **Kubernetes local com Kind**, provisionado por **Terraform** (`infra/`), sobre o qual são aplicados os manifestos de [`k8s/`](k8s): namespace, ConfigMap, Secret, MongoDB (Deployment/Service/PVC), Job de migrations, API (Deployment/Service NodePort) e HPA. O `metrics-server` habilita o autoscaling.
 
-| Área | Exemplos (prefixos reais no Swagger) |
-|------|----------------------------------------|
-| Autenticação | `POST /auth/login`, `POST /auth/users` |
-| Clientes, veículos | `/clients`, `/vehicle` |
-| Produtos e estoque | `/product`, `/product-batch` |
-| Catálogo e OS | `/services`, `/service-orders` |
-| Público (cliente) | `GET /public/service-orders/...`, aprovar/rejeitar orçamento |
+Diagrama: [`docs/diagrams/infra-kind-k8s.md`](docs/diagrams/infra-kind-k8s.md)
+
+### Fluxo de deploy (CI/CD)
+
+Pipelines no GitHub Actions: **CI** ([`ci.yml`](.github/workflows/ci.yml)) roda testes e build; **CD** ([`cd.yml`](.github/workflows/cd.yml)) testa, constrói as imagens Docker (`production` e `migrations`), provisiona o cluster Kind via Terraform, aplica os manifestos, roda as migrations, faz o deploy da API + HPA e executa o smoke test.
+
+Diagrama: [`docs/diagrams/cicd-deploy.md`](docs/diagrams/cicd-deploy.md)
 
 ---
 
-## Testes, lint e produção
+## Instruções
 
-| Comando | Descrição |
-|---------|-----------|
-| `yarn test` | Testes unitários (com cobertura mínima nos domínios críticos) |
-| `yarn test:integration` | Testes de integração do fluxo principal da OS (Mongo em execução) |
-| `yarn lint` | ESLint |
-| `yarn format` | Prettier |
-| `yarn build` | Build para produção |
-| `yarn start:prod` | Correr o build |
+### Execução local (Docker Compose)
 
-Roteiros manuais com **URL e body:** [docs/api-fluxo-url-body.md](docs/api-fluxo-url-body.md) (índice e login), [docs/api-fluxo-variante-a-criar-pela-api.md](docs/api-fluxo-variante-a-criar-pela-api.md) (criar dados pela API) e [docs/api-fluxo-variante-b-migration-fixtures.md](docs/api-fluxo-variante-b-migration-fixtures.md) (fixtures `yarn migrate:up`).
+```bash
+cp .env.example .env
+docker compose up -d --build
+yarn migrate:up
+# Swagger: http://localhost:3000/api  (login seed: admin@local.dev / admin123)
+```
+
+Testes automatizados via Docker: `yarn test:unit:docker` (unitários) e `yarn test:integration:docker` (integração com Mongo). Passo a passo completo em [`readme/fase-1.md`](readme/fase-1.md).
+
+### Provisionamento da infraestrutura (Terraform + Kind)
+
+Cria o cluster Kind, o namespace da aplicação e o metrics-server (necessário para o HPA).
+
+```bash
+cd infra
+terraform init
+terraform apply -auto-approve
+kind export kubeconfig --name tech-challenge
+kubectl get nodes
+```
+
+Detalhes e variáveis em [`infra/README.md`](infra/README.md).
+
+### Deploy em Kubernetes
+
+Com o cluster provisionado e as imagens carregadas (`kind load docker-image ...`), aplique os manifestos de [`k8s/`](k8s):
+
+```bash
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/mongo-pvc.yaml -f k8s/mongo-service.yaml -f k8s/mongo-deployment.yaml
+kubectl apply -f k8s/migration-job.yaml
+kubectl apply -f k8s/api-deployment.yaml -f k8s/api-service.yaml -f k8s/hpa.yaml
+kubectl port-forward svc/api 8080:80 -n tech-challenge-namespace
+# Health: http://localhost:8080/health/live e /health/ready
+```
+
+Passo a passo completo (imagens, migrations e smoke test) em [`readme/fase-2.md`](readme/fase-2.md).
+
+---
+
+## APIs
+
+- **Swagger (OpenAPI):** disponível em `http://localhost:3000/api` (local) ou `http://localhost:8080/api` (via `port-forward` no cluster).
+- **Collection (Postman/Insomnia):** _(a preencher com o link da collection)_
+- **Passo a passo dos endpoints da Fase 2** (open → diagnóstico → orçamento → aprovação + status + listagem): [`docs/api-fluxo-fase-2-endpoints.md`](docs/api-fluxo-fase-2-endpoints.md)
+- Outros roteiros: [`docs/api-fluxo-url-body.md`](docs/api-fluxo-url-body.md) e variantes na pasta [`docs/`](docs).
+
+---
+
+## Vídeo demonstrativo
+
+Demonstra deploy da aplicação, execução do CI/CD, consumo das APIs e escalabilidade automática (HPA).
+
+- **Link (YouTube/Vimeo, até 15 min):** _(a preencher com o link do vídeo)_
+
+---
+
+## Outros documentos
+
+- Documentação por fase: [`readme/fase-1.md`](readme/fase-1.md) e [`readme/fase-2.md`](readme/fase-2.md)
+- Infraestrutura (Terraform/Kind): [`infra/README.md`](infra/README.md)
 
 **Licença:** UNLICENSED (projeto acadêmico).

@@ -1,4 +1,7 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BusinessRuleViolationError,
+  EntityNotFoundError,
+} from '../../../../shared/domain/errors';
 import type { ServiceOrder } from '../../../domain/entities/service-order';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
 
@@ -19,18 +22,18 @@ export function assertPublicServiceOrderIdentity(
 ): void {
   const docTrim = document?.trim();
   if (!docTrim) {
-    throw new BadRequestException('Parâmetro document é obrigatório');
+    throw new BusinessRuleViolationError('Parâmetro document é obrigatório');
   }
   const docQuery = normalizePublicDocument(docTrim);
   const docStored = normalizePublicDocument(order.clientDocument);
   if (docQuery !== docStored) {
-    throw new NotFoundException(PUBLIC_SERVICE_ORDER_ACCESS_DENIED);
+    throw new EntityNotFoundError(PUBLIC_SERVICE_ORDER_ACCESS_DENIED);
   }
   if (plate?.trim()) {
     const pQ = normalizePublicPlate(plate.trim());
     const pS = normalizePublicPlate(order.vehiclePlate);
     if (pQ !== pS) {
-      throw new NotFoundException(PUBLIC_SERVICE_ORDER_ACCESS_DENIED);
+      throw new EntityNotFoundError(PUBLIC_SERVICE_ORDER_ACCESS_DENIED);
     }
   }
 }
@@ -43,11 +46,11 @@ export async function loadServiceOrderForPublicClient(
 ): Promise<ServiceOrder> {
   const docTrim = document?.trim();
   if (!docTrim) {
-    throw new BadRequestException('Parâmetro document é obrigatório');
+    throw new BusinessRuleViolationError('Parâmetro document é obrigatório');
   }
   const order = await repo.findById(serviceOrderId);
   if (!order) {
-    throw new NotFoundException(PUBLIC_SERVICE_ORDER_ACCESS_DENIED);
+    throw new EntityNotFoundError(PUBLIC_SERVICE_ORDER_ACCESS_DENIED);
   }
   assertPublicServiceOrderIdentity(order, document, plate);
   return order;

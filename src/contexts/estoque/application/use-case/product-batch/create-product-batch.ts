@@ -1,4 +1,5 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../shared/domain/errors';
 import { ProductBatch } from '../../../domain/entities/product-batch';
 import type { ProductRepositoryInterface } from '../../../domain/repositories/product.repository';
 import type { ProductBatchRepositoryInterface } from '../../../domain/repositories/product-batch.repository';
@@ -30,7 +31,7 @@ export class CreateProductBatchUseCase {
     const product = await this.productRepo.findByCodeOrNull(code);
 
     if (!product) {
-      throw new NotFoundException(
+      throw new EntityNotFoundError(
         `Product with code "${code}" not found. Please create the product before creating a batch.`,
       );
     }

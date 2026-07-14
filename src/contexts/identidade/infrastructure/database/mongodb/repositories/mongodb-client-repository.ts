@@ -1,8 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../../shared/domain/errors';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Client } from '../../../../domain/entities/client';
-import { DocumentVO } from '../../../../domain/value-objects/document.vo';
+import { DocumentVO } from '../../../../../shared/domain/value-objects/document.vo';
 import { EmailVO } from '../../../../domain/value-objects/email.vo';
 import { ClientRepositoryInterface } from '../../../../domain/repositories/client.repository';
 import { ClientModel } from '../models/client/client.model';
@@ -49,7 +49,7 @@ export class MongodbClientRepository implements ClientRepositoryInterface {
     const client = await this.clientModel.findOne({ document: docKey });
 
     if (!client) {
-      throw new NotFoundException('Client not found');
+      throw new EntityNotFoundError('Client not found');
     }
 
     return this.toDomain(client);
@@ -72,7 +72,7 @@ export class MongodbClientRepository implements ClientRepositoryInterface {
     );
 
     if (!updated) {
-      throw new NotFoundException('Client not found');
+      throw new EntityNotFoundError('Client not found');
     }
 
     return this.toDomain(updated);

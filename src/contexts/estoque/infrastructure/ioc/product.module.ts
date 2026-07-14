@@ -19,6 +19,6 @@ import { EstoqueDatabaseModule } from '../database/database.module';
     UpdateProductUseCase,
   ],
   controllers: [ProductController],
-  exports: [EstoqueDatabaseModule, GetProductUseCase],
+  exports: [EstoqueDatabaseModule, GetProductUseCase, CreateProductUseCase],
 })
 export class ProductModule {}

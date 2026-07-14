@@ -1,13 +1,16 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../shared/domain/errors';
 import { ServiceOrder } from '../../../domain/entities/service-order';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
-import type { ClientRepositoryInterface } from '../../../../identidade/domain/repositories/client.repository';
-import type { VehicleRepositoryInterface } from '../../../../identidade/domain/repositories/vehicle.repository';
 import { SERVICE_ORDER_REPOSITORY } from '../../../domain/repositories/tokens';
 import {
-  CLIENT_REPOSITORY,
-  VEHICLE_REPOSITORY,
-} from '../../../../identidade/domain/repositories/tokens';
+  CLIENT_LOOKUP,
+  type ClientLookupPort,
+} from '../../../domain/ports/client-lookup.port';
+import {
+  VEHICLE_LOOKUP,
+  type VehicleLookupPort,
+} from '../../../domain/ports/vehicle-lookup.port';
 import type { CreateServiceOrderInput } from './service-order.inputs';
 
 @Injectable()
@@ -15,20 +18,20 @@ export class CreateServiceOrderUseCase {
   constructor(
     @Inject(SERVICE_ORDER_REPOSITORY)
     private readonly orderRepo: ServiceOrderRepositoryInterface,
-    @Inject(CLIENT_REPOSITORY)
-    private readonly clientRepo: ClientRepositoryInterface,
-    @Inject(VEHICLE_REPOSITORY)
-    private readonly vehicleRepo: VehicleRepositoryInterface,
+    @Inject(CLIENT_LOOKUP)
+    private readonly clientLookup: ClientLookupPort,
+    @Inject(VEHICLE_LOOKUP)
+    private readonly vehicleLookup: VehicleLookupPort,
   ) {}
 
   async execute(input: CreateServiceOrderInput): Promise<ServiceOrder> {
-    const client = await this.clientRepo.findById(input.clientId);
+    const client = await this.clientLookup.findById(input.clientId);
     if (!client) {
-      throw new NotFoundException(`Client "${input.clientId}" not found`);
+      throw new EntityNotFoundError(`Client "${input.clientId}" not found`);
     }
-    const vehicle = await this.vehicleRepo.findById(input.vehicleId);
+    const vehicle = await this.vehicleLookup.findById(input.vehicleId);
     if (!vehicle) {
-      throw new NotFoundException(`Vehicle "${input.vehicleId}" not found`);
+      throw new EntityNotFoundError(`Vehicle "${input.vehicleId}" not found`);
     }
 
     const order = ServiceOrder.create({

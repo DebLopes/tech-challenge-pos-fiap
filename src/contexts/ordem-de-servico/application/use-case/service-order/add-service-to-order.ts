@@ -1,17 +1,18 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+  BusinessRuleViolationError,
+  EntityNotFoundError,
+} from '../../../../shared/domain/errors';
 import type { CatalogServiceRepositoryInterface } from '../../../domain/repositories/catalog-service.repository';
-import type { ProductRepositoryInterface } from '../../../domain/repositories/product.repository';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
 import {
   CATALOG_SERVICE_REPOSITORY,
-  PRODUCT_REPOSITORY,
   SERVICE_ORDER_REPOSITORY,
 } from '../../../domain/repositories/tokens';
+import {
+  PRODUCT_LOOKUP,
+  type ProductLookupPort,
+} from '../../../domain/ports/product-lookup.port';
 import { ServiceOrder } from '../../../domain/entities/service-order';
 
 @Injectable()
@@ -21,8 +22,8 @@ export class AddServiceToOrderUseCase {
     private readonly orderRepo: ServiceOrderRepositoryInterface,
     @Inject(CATALOG_SERVICE_REPOSITORY)
     private readonly catalogRepo: CatalogServiceRepositoryInterface,
-    @Inject(PRODUCT_REPOSITORY)
-    private readonly productRepo: ProductRepositoryInterface,
+    @Inject(PRODUCT_LOOKUP)
+    private readonly productLookup: ProductLookupPort,
   ) {}
 
   async execute(
@@ -31,12 +32,12 @@ export class AddServiceToOrderUseCase {
     quantity = 1,
   ): Promise<ServiceOrder> {
     const order = await this.orderRepo.findById(orderId);
-    if (!order) throw new NotFoundException('Service order not found');
+    if (!order) throw new EntityNotFoundError('Service order not found');
 
     const catalog = await this.catalogRepo.findById(catalogServiceId);
-    if (!catalog) throw new NotFoundException('Catalog service not found');
+    if (!catalog) throw new EntityNotFoundError('Catalog service not found');
     if (!catalog.active) {
-      throw new BadRequestException(
+      throw new BusinessRuleViolationError(
         'Cannot add an inactive catalog service to an order',
       );
     }
@@ -47,7 +48,7 @@ export class AddServiceToOrderUseCase {
       quantity: number;
     }[] = [];
     for (const p of catalog.defaultParts ?? []) {
-      const product = await this.productRepo.findByCodeOrNull(p.productCode);
+      const product = await this.productLookup.findByCodeOrNull(p.productCode);
       defaultParts.push({
         productCode: p.productCode,
         name: product?.name ?? p.productCode,
@@ -64,7 +65,7 @@ export class AddServiceToOrderUseCase {
         defaultParts,
       });
     } catch (e) {
-      throw new BadRequestException(
+      throw new BusinessRuleViolationError(
         e instanceof Error ? e.message : 'Invalid operation',
       );
     }

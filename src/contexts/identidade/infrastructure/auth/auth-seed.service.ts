@@ -1,10 +1,6 @@
-import {
-  ConflictException,
-  Injectable,
-  Logger,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ConflictError } from '../../../shared/domain/errors';
 import { CreateUserUseCase } from '../../application/use-case/auth/create-user';
 import { UserRole } from '../../domain/entities/user-role';
 
@@ -43,7 +39,7 @@ export class AuthSeedService implements OnModuleInit {
         `Usuário inicial criado a partir de SEED_ADMIN_* (${email})`,
       );
     } catch (e) {
-      if (e instanceof ConflictException) {
+      if (e instanceof ConflictError) {
         this.logger.log(`Seed: email ${email} já cadastrado.`);
         return;
       }

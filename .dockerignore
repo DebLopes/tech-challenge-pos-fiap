@@ -1,11 +1,37 @@
+# dependencies (reinstaladas no build da imagem)
 node_modules
 dist
+
+# vcs / editor
 .git
 .gitignore
-Dockerfile
+.vscode
+.cursor
+
+# ambiente local
+.env
+.env.*
+
+# testes e cobertura (não necessários na imagem)
+coverage
+test
+
+# infra e deploy (não fazem parte do runtime da API)
+infra
+k8s
+.github
+
+# documentação
+README.md
+
+# compose / meta docker
 docker-compose.yml
+Dockerfile
+
+# logs
 npm-debug.log
 yarn-error.log
-.env
-coverage
-.vscode
+*.log
+
+# macOS
+.DS_Store

@@ -1,15 +1,14 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import type { ProductRepositoryInterface } from '../../../domain/repositories/product.repository';
+  BusinessRuleViolationError,
+  EntityNotFoundError,
+} from '../../../../shared/domain/errors';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
+import { SERVICE_ORDER_REPOSITORY } from '../../../domain/repositories/tokens';
 import {
-  PRODUCT_REPOSITORY,
-  SERVICE_ORDER_REPOSITORY,
-} from '../../../domain/repositories/tokens';
+  PRODUCT_LOOKUP,
+  type ProductLookupPort,
+} from '../../../domain/ports/product-lookup.port';
 import { ServiceOrder } from '../../../domain/entities/service-order';
 
 @Injectable()
@@ -17,8 +16,8 @@ export class AddPartToOrderUseCase {
   constructor(
     @Inject(SERVICE_ORDER_REPOSITORY)
     private readonly orderRepo: ServiceOrderRepositoryInterface,
-    @Inject(PRODUCT_REPOSITORY)
-    private readonly productRepo: ProductRepositoryInterface,
+    @Inject(PRODUCT_LOOKUP)
+    private readonly productLookup: ProductLookupPort,
   ) {}
 
   async execute(
@@ -27,12 +26,12 @@ export class AddPartToOrderUseCase {
     quantity: number,
   ): Promise<ServiceOrder> {
     const order = await this.orderRepo.findById(orderId);
-    if (!order) throw new NotFoundException('Service order not found');
+    if (!order) throw new EntityNotFoundError('Service order not found');
 
     const code = productCode.trim().toUpperCase();
-    const product = await this.productRepo.findByCodeOrNull(code);
+    const product = await this.productLookup.findByCodeOrNull(code);
     if (!product) {
-      throw new NotFoundException(`Product "${code}" not found`);
+      throw new EntityNotFoundError(`Product "${code}" not found`);
     }
 
     try {
@@ -42,7 +41,7 @@ export class AddPartToOrderUseCase {
         quantity,
       });
     } catch (e) {
-      throw new BadRequestException(
+      throw new BusinessRuleViolationError(
         e instanceof Error ? e.message : 'Invalid operation',
       );
     }

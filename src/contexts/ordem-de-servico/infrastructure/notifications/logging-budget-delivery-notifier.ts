@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import type {
   BudgetDeliveryNotifier,
   BudgetDeliveryPayload,
-} from '../../domain/services/budget-delivery-notifier.port';
+} from '../../domain/ports/budget-delivery-notifier.port';
 
 export const BUDGET_EMAIL_MESSAGE =
   'Use o serviceOrderId para consultar ou aprovar seu orçamento.';

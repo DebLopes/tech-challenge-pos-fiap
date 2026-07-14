@@ -1,0 +1,5 @@
+cluster_name          = "tech-challenge"
+namespace             = "tech-challenge-namespace"
+node_image            = "kindest/node:v1.32.2"
+kubeconfig_path       = "~/.kube/kind-tech-challenge"
+enable_metrics_server = true

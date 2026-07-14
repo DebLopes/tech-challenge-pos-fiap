@@ -1,4 +1,5 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../shared/domain/errors';
 import type { CatalogServiceRepositoryInterface } from '../../../domain/repositories/catalog-service.repository';
 import { CATALOG_SERVICE_REPOSITORY } from '../../../domain/repositories/tokens';
 
@@ -12,7 +13,7 @@ export class DeleteCatalogServiceUseCase {
   async execute(id: string): Promise<void> {
     const existing = await this.catalogRepo.findById(id);
     if (!existing) {
-      throw new NotFoundException('Catalog service not found');
+      throw new EntityNotFoundError('Catalog service not found');
     }
     await this.catalogRepo.remove(id);
   }

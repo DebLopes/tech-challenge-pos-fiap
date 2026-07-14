@@ -1,4 +1,5 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConflictError } from '../../../../shared/domain/errors';
 import * as bcrypt from 'bcrypt';
 import { User } from '../../../domain/entities/user';
 import type { UserRepositoryInterface } from '../../../domain/repositories/user.repository';
@@ -20,7 +21,7 @@ export class CreateUserUseCase {
     const email = input.email.toLowerCase();
     const existing = await this.users.findByEmail(email);
     if (existing) {
-      throw new ConflictException('Email já cadastrado');
+      throw new ConflictError('Email já cadastrado');
     }
 
     const passwordHash = await bcrypt.hash(input.password, SALT_ROUNDS);

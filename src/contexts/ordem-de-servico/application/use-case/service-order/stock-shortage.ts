@@ -1,4 +1,4 @@
-import { ConflictException } from '@nestjs/common';
+import { ConflictError } from '../../../../shared/domain/errors';
 
 export type StockShortageItem = {
   productCode: string;
@@ -13,10 +13,9 @@ export const STOCK_SHORTAGE_CODE = 'INSUFFICIENT_STOCK';
 
 export function conflictExceptionForStockShortage(
   items: StockShortageItem[],
-): ConflictException {
-  return new ConflictException({
-    message: STOCK_SHORTAGE_USER_MESSAGE,
+): ConflictError {
+  return new ConflictError(STOCK_SHORTAGE_USER_MESSAGE, {
     code: STOCK_SHORTAGE_CODE,
-    items,
+    details: { items },
   });
 }

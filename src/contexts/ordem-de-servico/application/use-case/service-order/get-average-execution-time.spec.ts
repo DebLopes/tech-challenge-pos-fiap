@@ -2,8 +2,8 @@ import { describe, expect, it } from '@jest/globals';
 import { ServiceOrder } from '../../../domain/entities/service-order';
 import { ServiceOrderStatus } from '../../../domain/entities/service-order-status';
 import type { ServiceOrderRepositoryInterface } from '../../../domain/repositories/service-order.repository';
-import { DocumentVO } from '../../../../identidade/domain/value-objects/document.vo';
-import { PlateVO } from '../../../../identidade/domain/value-objects/plate.vo';
+import { DocumentVO } from '../../../../shared/domain/value-objects/document.vo';
+import { PlateVO } from '../../../../shared/domain/value-objects/plate.vo';
 import { Money } from '../../../../shared/domain/value-objects/money.vo';
 import { GetAverageExecutionTimeUseCase } from './get-average-execution-time';
 

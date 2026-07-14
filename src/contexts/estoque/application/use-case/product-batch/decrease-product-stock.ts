@@ -1,4 +1,5 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { BusinessRuleViolationError } from '../../../../shared/domain/errors';
 import { sumProductBatchQuantities } from '../../../domain/entities/product-batch';
 import type { ProductBatchRepositoryInterface } from '../../../domain/repositories/product-batch.repository';
 import { PRODUCT_BATCH_REPOSITORY } from '../../../domain/repositories/tokens';
@@ -28,7 +29,9 @@ export class DecreaseProductStockUseCase {
     quantity: number,
   ): Promise<DecreaseStockResult> {
     if (quantity <= 0) {
-      throw new BadRequestException('Quantity must be greater than zero');
+      throw new BusinessRuleViolationError(
+        'Quantity must be greater than zero',
+      );
     }
 
     const batches =
@@ -36,7 +39,7 @@ export class DecreaseProductStockUseCase {
     const available = sumProductBatchQuantities(batches);
 
     if (available < quantity) {
-      throw new BadRequestException(
+      throw new BusinessRuleViolationError(
         `Insufficient stock for product "${productCode}". Available: ${available}, required: ${quantity}.`,
       );
     }

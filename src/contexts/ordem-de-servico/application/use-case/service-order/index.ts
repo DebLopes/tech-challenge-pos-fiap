@@ -10,6 +10,7 @@ export * from './get-average-execution-time';
 export * from './get-public-service-order-budget';
 export * from './get-public-service-order-status';
 export * from './get-service-order';
+export * from './open-service-order';
 export * from './public-approve-budget';
 export * from './public-reject-budget';
 export * from './register-diagnosis';

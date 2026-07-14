@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { PlateVO } from '../value-objects/plate.vo';
+import { PlateVO } from '../../../shared/domain/value-objects/plate.vo';
 
 export type VehicleProps = {
   plate: PlateVO;

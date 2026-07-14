@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { IsCPFOrCNPJ } from '../../shared/validators/is-cpf-or-cnpj.validator';
+import { IsCPFOrCNPJ } from '../../../../../shared/interfaces/http/validators/is-cpf-or-cnpj.validator';
 
 export class CreateClientDto {
   @ApiProperty({

@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { EntityNotFoundError } from '../../../../../shared/domain/errors';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
@@ -46,7 +46,7 @@ export class MongodbProductBatchRepository implements ProductBatchRepositoryInte
     const product = await this.productBatchModel.find({ productCode });
 
     if (!product.length) {
-      throw new NotFoundException('Product Batch not found');
+      throw new EntityNotFoundError('Product Batch not found');
     }
 
     return product.map((d) => this.toDomain(d));
@@ -75,7 +75,7 @@ export class MongodbProductBatchRepository implements ProductBatchRepositoryInte
     );
 
     if (!updated) {
-      throw new NotFoundException('ProductBatch not found');
+      throw new EntityNotFoundError('ProductBatch not found');
     }
 
     return this.toDomain(updated);

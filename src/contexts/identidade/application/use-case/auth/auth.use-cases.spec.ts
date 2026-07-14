@@ -1,4 +1,7 @@
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictError,
+  UnauthorizedError,
+} from '../../../../shared/domain/errors';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'node:crypto';
 import { describe, expect, it } from '@jest/globals';
@@ -71,7 +74,7 @@ describe('Auth use cases', () => {
         password: alternatePassword,
         role: UserRole.ATENDENTE,
       }),
-    ).rejects.toBeInstanceOf(ConflictException);
+    ).rejects.toBeInstanceOf(ConflictError);
   });
 
   it('login returns JWT string', async () => {
@@ -123,7 +126,7 @@ describe('Auth use cases', () => {
         email: 'x@test.com',
         password: randomBytes(16).toString('base64url'),
       }),
-    ).rejects.toBeInstanceOf(UnauthorizedException);
+    ).rejects.toBeInstanceOf(UnauthorizedError);
   });
 
   it('validate-user rejects inactive user', async () => {
@@ -145,7 +148,7 @@ describe('Auth use cases', () => {
     };
 
     await expect(useCase.execute(payload)).rejects.toBeInstanceOf(
-      UnauthorizedException,
+      UnauthorizedError,
     );
   });
 

@@ -44,4 +44,68 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-argument': 'off',
     },
   },
+  // Clean Architecture: regra de dependência — camadas internas não conhecem as externas.
+  {
+    files: ['src/contexts/*/domain/**/*.ts'],
+    ignores: ['**/*.spec.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@nestjs', '@nestjs/*'],
+              message:
+                'domain não pode depender de NestJS (independência de framework).',
+            },
+            {
+              group: [
+                '**/application/**',
+                '**/infrastructure/**',
+                '**/interfaces/**',
+              ],
+              message:
+                'domain só pode depender de domain (mesmo contexto) ou shared/domain.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/contexts/*/application/**/*.ts'],
+    ignores: ['**/*.spec.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/infrastructure/**', '**/interfaces/**'],
+              message:
+                'application não pode depender de infrastructure/interfaces; use ports/domain.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/contexts/*/interfaces/**/*.ts'],
+    ignores: ['**/*.spec.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/infrastructure/**'],
+              message:
+                'interfaces (HTTP) não pode depender de infrastructure; a composição fica no IoC.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

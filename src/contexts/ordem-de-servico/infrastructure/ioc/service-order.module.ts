@@ -12,26 +12,25 @@ import {
   GetPublicServiceOrderBudgetUseCase,
   GetPublicServiceOrderStatusUseCase,
   GetServiceOrderUseCase,
+  OpenServiceOrderUseCase,
   PublicApproveBudgetUseCase,
   PublicRejectBudgetUseCase,
   RegisterDiagnosisUseCase,
   RejectBudgetUseCase,
 } from '../../application/use-case/service-order';
-import { BUDGET_DELIVERY_NOTIFIER } from '../../domain/services/budget-delivery-notifier.port';
+import { BUDGET_DELIVERY_NOTIFIER } from '../../domain/ports/budget-delivery-notifier.port';
 import { PublicServiceOrderController } from '../../interfaces/http/service-order/public-service-order.controller';
 import { ServiceOrderController } from '../../interfaces/http/service-order/service-order.controller';
 import { LoggingBudgetDeliveryNotifier } from '../notifications/logging-budget-delivery-notifier';
 import { OrdemDeServicoDatabaseModule } from '../database/database.module';
-import { EstoqueModule } from '../../../shared/infrastructure/ioc/estoque.module';
-import { IdentidadeDatabaseModule } from '../../../identidade/infrastructure/database/database.module';
 import { CatalogServiceDatabaseModule } from '../database/catalog-service-database.module';
+import { OrdemDeServicoAdaptersModule } from '../adapters/adapters.module';
 
 @Module({
   imports: [
     OrdemDeServicoDatabaseModule,
-    EstoqueModule,
-    IdentidadeDatabaseModule,
     CatalogServiceDatabaseModule,
+    OrdemDeServicoAdaptersModule,
   ],
   providers: [
     {
@@ -39,6 +38,7 @@ import { CatalogServiceDatabaseModule } from '../database/catalog-service-databa
       useClass: LoggingBudgetDeliveryNotifier,
     },
     CreateServiceOrderUseCase,
+    OpenServiceOrderUseCase,
     GetServiceOrderUseCase,
     GetAllServiceOrdersUseCase,
     RegisterDiagnosisUseCase,
