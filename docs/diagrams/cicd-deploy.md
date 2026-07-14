@@ -45,6 +45,7 @@ flowchart TB
         D5 --> D6["Job api-migration"]
         D6 --> D7["API Deployment Service HPA"]
         D7 --> D8["Smoke test /health/live e /health/ready"]
+        D8 --> D9["terraform destroy if always"]
     end
 
     Trigger --> Test
@@ -52,8 +53,9 @@ flowchart TB
     Images --> Deploy
 ```
 
-> O passo de `terraform destroy` existe no `cd.yml` apenas **comentado** (teardown
-> desabilitado para manter o cluster após o deploy).
+> Após o smoke test, o `cd.yml` roda `terraform destroy` com `if: always()`
+> (sucesso ou falha). O cluster Kind do CD vive só no runner efêmero do job;
+> demos ou inspeção prolongada usam Kind local (`infra/`).
 
 ## Resumo
 
@@ -61,4 +63,4 @@ flowchart TB
 |-------|------|-----------|
 | **CI** | `ci.yml` (job `test`) | Build, testes unitários e de integração a cada PR/push |
 | **CD — Build** | `cd.yml` (job `build-images`) | Gera imagens Docker `production` e `migrations` |
-| **CD — Deploy** | `cd.yml` (job `deploy`) | Cria cluster Kind, aplica migrations, faz deploy da API + HPA e valida com smoke test |
+| **CD — Deploy** | `cd.yml` (job `deploy`) | Cria cluster Kind, aplica migrations, faz deploy da API + HPA, valida com smoke test e destrói o cluster |

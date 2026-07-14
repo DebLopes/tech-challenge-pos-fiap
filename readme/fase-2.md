@@ -186,8 +186,11 @@ O pipeline automatiza todo o fluxo acima. Veja o
   2. **Build das imagens** Docker (`production` e `migrations`) salvas como artefatos;
   3. **Deploy**: `terraform apply` (Kind), carrega imagens, aplica config, sobe o
      Mongo, roda as migrations, faz o deploy da API + HPA e executa **smoke test**
-     em `/health/live` e `/health/ready`. O teardown (`terraform destroy`) está
-     comentado no workflow e não roda automaticamente.
+     em `/health/live` e `/health/ready`. Ao final, com `if: always()`, o workflow
+     roda `terraform destroy` e derruba o cluster Kind (sucesso ou falha). O
+     runner do GitHub Actions é efêmero: esse cluster existe só durante o job; a
+     validação do CD é o smoke test. Para demos ou inspeção prolongada, use o
+     Kind local (`infra/` + passos manuais desta página).
 
 ---
 
