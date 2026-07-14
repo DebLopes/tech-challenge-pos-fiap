@@ -6,11 +6,11 @@ import { CreateProductUseCase } from '../../../estoque/application/use-case/prod
 import type {
   ProductLookupPort,
   ProductSnapshot,
-} from '../../domain/services/product-lookup.port';
+} from '../../domain/ports/product-lookup.port';
 import type {
   ProductProvisioningPort,
   ProvisionProductInput,
-} from '../../domain/services/product-provisioning.port';
+} from '../../domain/ports/product-provisioning.port';
 
 @Injectable()
 export class EstoqueProductAdapter

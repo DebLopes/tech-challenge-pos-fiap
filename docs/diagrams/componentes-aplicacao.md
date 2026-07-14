@@ -81,7 +81,7 @@ flowchart LR
     subgraph Contexto["src/contexts/<contexto>"]
         Interfaces["interfaces (HTTP: controllers, DTOs, validators)"]
         Application["application (use-cases)"]
-        Domain["domain (entidades, value-objects, regras)"]
+        Domain["domain (entities, value-objects, repositories, ports, services)"]
         Infrastructure["infrastructure (Mongoose repositories, IoC)"]
     end
 
@@ -93,4 +93,5 @@ flowchart LR
 
 > **Nota:** as regras de dependência apontam sempre para o `domain`. As camadas
 > `interfaces` e `infrastructure` dependem de `application`/`domain`, nunca o
-> contrário.
+> contrário. Em `domain`, `ports/` guarda contratos externos (`*.port.ts`);
+> `services/` fica só para lógica de domínio pura (sem I/O), quando existir.

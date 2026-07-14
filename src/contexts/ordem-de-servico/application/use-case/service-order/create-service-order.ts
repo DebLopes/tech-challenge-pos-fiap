@@ -6,11 +6,11 @@ import { SERVICE_ORDER_REPOSITORY } from '../../../domain/repositories/tokens';
 import {
   CLIENT_LOOKUP,
   type ClientLookupPort,
-} from '../../../domain/services/client-lookup.port';
+} from '../../../domain/ports/client-lookup.port';
 import {
   VEHICLE_LOOKUP,
   type VehicleLookupPort,
-} from '../../../domain/services/vehicle-lookup.port';
+} from '../../../domain/ports/vehicle-lookup.port';
 import type { CreateServiceOrderInput } from './service-order.inputs';
 
 @Injectable()

@@ -10,33 +10,33 @@ import type { ServiceOrderRepositoryInterface } from '../../../../domain/reposit
 import type {
   ClientLookupPort,
   ClientSnapshot,
-} from '../../../../domain/services/client-lookup.port';
+} from '../../../../domain/ports/client-lookup.port';
 import type {
   ClientProvisioningPort,
   ProvisionClientInput,
-} from '../../../../domain/services/client-provisioning.port';
+} from '../../../../domain/ports/client-provisioning.port';
 import type {
   BudgetDeliveryNotifier,
   BudgetDeliveryPayload,
-} from '../../../../domain/services/budget-delivery-notifier.port';
+} from '../../../../domain/ports/budget-delivery-notifier.port';
 import type {
   ProductLookupPort,
   ProductSnapshot,
-} from '../../../../domain/services/product-lookup.port';
+} from '../../../../domain/ports/product-lookup.port';
 import type {
   VehicleLookupPort,
   VehicleSnapshot,
-} from '../../../../domain/services/vehicle-lookup.port';
+} from '../../../../domain/ports/vehicle-lookup.port';
 import type {
   ProvisionVehicleInput,
   VehicleProvisioningPort,
-} from '../../../../domain/services/vehicle-provisioning.port';
+} from '../../../../domain/ports/vehicle-provisioning.port';
 import type {
   StockAvailabilityItem,
   StockDemandItem,
   StockQuoteItem,
   StockServicePort,
-} from '../../../../../shared/domain/services/stock-service.port';
+} from '../../../../../shared/domain/ports/stock-service.port';
 import { DocumentVO } from '../../../../../shared/domain/value-objects/document.vo';
 import { Money } from '../../../../../shared/domain/value-objects/money.vo';
 import { PlateVO } from '../../../../../shared/domain/value-objects/plate.vo';

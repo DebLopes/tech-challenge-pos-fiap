@@ -9,7 +9,7 @@ import { ServiceOrder } from '../../../domain/entities/service-order';
 import {
   STOCK_SERVICE,
   type StockServicePort,
-} from '../../../../shared/domain/services/stock-service.port';
+} from '../../../../shared/domain/ports/stock-service.port';
 import {
   type StockShortageItem,
   conflictExceptionForStockShortage,

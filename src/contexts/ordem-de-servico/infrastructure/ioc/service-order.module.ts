@@ -18,7 +18,7 @@ import {
   RegisterDiagnosisUseCase,
   RejectBudgetUseCase,
 } from '../../application/use-case/service-order';
-import { BUDGET_DELIVERY_NOTIFIER } from '../../domain/services/budget-delivery-notifier.port';
+import { BUDGET_DELIVERY_NOTIFIER } from '../../domain/ports/budget-delivery-notifier.port';
 import { PublicServiceOrderController } from '../../interfaces/http/service-order/public-service-order.controller';
 import { ServiceOrderController } from '../../interfaces/http/service-order/service-order.controller';
 import { LoggingBudgetDeliveryNotifier } from '../notifications/logging-budget-delivery-notifier';

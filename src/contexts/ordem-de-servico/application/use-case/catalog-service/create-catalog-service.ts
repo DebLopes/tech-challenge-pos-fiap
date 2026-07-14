@@ -6,7 +6,7 @@ import { CATALOG_SERVICE_REPOSITORY } from '../../../domain/repositories/tokens'
 import {
   PRODUCT_LOOKUP,
   type ProductLookupPort,
-} from '../../../domain/services/product-lookup.port';
+} from '../../../domain/ports/product-lookup.port';
 import type { CreateCatalogServiceInput } from './catalog-service.inputs';
 
 @Injectable()

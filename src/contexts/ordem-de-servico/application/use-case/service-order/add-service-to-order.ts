@@ -12,7 +12,7 @@ import {
 import {
   PRODUCT_LOOKUP,
   type ProductLookupPort,
-} from '../../../domain/services/product-lookup.port';
+} from '../../../domain/ports/product-lookup.port';
 import { ServiceOrder } from '../../../domain/entities/service-order';
 
 @Injectable()

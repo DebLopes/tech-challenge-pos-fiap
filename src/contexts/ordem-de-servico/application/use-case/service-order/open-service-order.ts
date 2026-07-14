@@ -17,15 +17,15 @@ import {
 import {
   CLIENT_PROVISIONING,
   type ClientProvisioningPort,
-} from '../../../domain/services/client-provisioning.port';
+} from '../../../domain/ports/client-provisioning.port';
 import {
   VEHICLE_PROVISIONING,
   type VehicleProvisioningPort,
-} from '../../../domain/services/vehicle-provisioning.port';
+} from '../../../domain/ports/vehicle-provisioning.port';
 import {
   PRODUCT_LOOKUP,
   type ProductLookupPort,
-} from '../../../domain/services/product-lookup.port';
+} from '../../../domain/ports/product-lookup.port';
 import type { OpenServiceOrderInput } from './service-order.inputs';
 
 @Injectable()

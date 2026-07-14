@@ -7,11 +7,11 @@ import { CreateClientUseCase } from '../../../identidade/application/use-case/cl
 import type {
   ClientLookupPort,
   ClientSnapshot,
-} from '../../domain/services/client-lookup.port';
+} from '../../domain/ports/client-lookup.port';
 import type {
   ClientProvisioningPort,
   ProvisionClientInput,
-} from '../../domain/services/client-provisioning.port';
+} from '../../domain/ports/client-provisioning.port';
 
 @Injectable()
 export class IdentidadeClientAdapter

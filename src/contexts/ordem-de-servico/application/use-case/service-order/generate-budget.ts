@@ -14,15 +14,15 @@ import { SERVICE_ORDER_REPOSITORY } from '../../../domain/repositories/tokens';
 import {
   CLIENT_LOOKUP,
   type ClientLookupPort,
-} from '../../../domain/services/client-lookup.port';
+} from '../../../domain/ports/client-lookup.port';
 import {
   BUDGET_DELIVERY_NOTIFIER,
   type BudgetDeliveryNotifier,
-} from '../../../domain/services/budget-delivery-notifier.port';
+} from '../../../domain/ports/budget-delivery-notifier.port';
 import {
   STOCK_SERVICE,
   type StockServicePort,
-} from '../../../../shared/domain/services/stock-service.port';
+} from '../../../../shared/domain/ports/stock-service.port';
 
 @Injectable()
 export class GenerateBudgetUseCase {

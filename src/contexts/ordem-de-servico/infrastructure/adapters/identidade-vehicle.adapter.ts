@@ -7,11 +7,11 @@ import { CreateVehicleUseCase } from '../../../identidade/application/use-case/v
 import type {
   VehicleLookupPort,
   VehicleSnapshot,
-} from '../../domain/services/vehicle-lookup.port';
+} from '../../domain/ports/vehicle-lookup.port';
 import type {
   VehicleProvisioningPort,
   ProvisionVehicleInput,
-} from '../../domain/services/vehicle-provisioning.port';
+} from '../../domain/ports/vehicle-provisioning.port';
 
 @Injectable()
 export class IdentidadeVehicleAdapter
