@@ -102,7 +102,7 @@ yarn migrate:up
 
 Demonstra deploy da aplicação, execução do CI/CD, consumo das APIs e escalabilidade automática (HPA).
 
-- **Link (Google Drive):** [Fase 2 — vídeo demonstrativo](https://drive.google.com/file/d/1di2HvVkfFukrWpAVSHqLT-vp4G2Tois5/view?usp=drive_link)
+- **Link (Google Drive):** [Fase 2 — vídeo demonstrativo](https://drive.google.com/drive/folders/1lh3C0epIgxDlT67pXlC3IdDHHwV4oc2z?usp=sharing)
 
 ---
 
